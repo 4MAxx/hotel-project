@@ -1,0 +1,102 @@
+{% extends 'base_main.html' %}
+
+{% block content %}
+        <!-- Room Section Start -->
+        <div id="rooms">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Пентхаусы & комнатухи</h2>
+                    <p>
+                        На любой вкус
+                    </p>
+                </div>
+                <!--  -->
+                <div class="row">
+                    {% for room in room_list %}
+                    
+                    <div class="col-md-12 room">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="room-img">
+                                    <img src="{{ room.img.url }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="room-des">
+                                    <h3>{{ room.category }}</h3>
+                                    <h1>${{ room.price }}<span>/ Ночь</span></h1>
+                                    <ul class="room-size">
+                                        <li><i class="fa fa-arrow-right"></i>Размер: {{ room.size }} м2 </li>
+                                        <li><i class="fa fa-arrow-right"></i>Кроватей: {{ room.beds }} раздельных </li>
+                                    </ul>
+                                    <ul class="room-icon">
+                                        <li class="icon-1"></li>
+                                        <li class="icon-2"></li>
+                                        <li class="icon-3"></li>
+                                        <li class="icon-4"></li>
+                                        <li class="icon-5"></li>
+                                        <li class="icon-6"></li>
+                                        <li class="icon-7"></li>
+                                        <li class="icon-8"></li>
+                                        <li class="icon-9"></li>
+                                        <li class="icon-10"></li>
+                                    </ul>
+                                    <div class="room-link">
+                                        <a href="#" data-toggle="modal" data-target="#modal-id{{ forloop.counter }}">Подробнее</a>
+                                        <a href="{% url 'booking' %}">Забронируй сейчас</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Room Section End -->
+        
+        <!-- Modal for Room Section Start -->
+        {% for room in room_list %}
+        
+        <div id="modal-id{{ forloop.counter }}" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="port-slider">
+                                    <div><img src="{{ room.slide1.url }}"></div>
+                                    <div><img src="{{ room.slide2.url }}"></div>
+                                    <div><img src="{{ room.slide3.url }}"></div>
+
+                                </div>
+                                <div class="port-slider-nav">
+                                    <div><img src="{{ room.slide1.url }}"></div>
+                                    <div><img src="{{ room.slide2.url }}"></div>
+                                    <div><img src="{{ room.slide3.url }}"></div>
+
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <h2>{{ room.category }}</h2>
+                                <p>
+                                    {{ room.text }}
+                                </p>
+                                <div class="modal-link">
+                                    <a href="{% url 'booking' %}">Забронируй сейчас</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% endfor %}
+        <!-- Modal for Room Section End -->
+{% endblock %}
