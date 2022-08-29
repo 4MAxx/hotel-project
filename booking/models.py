@@ -18,7 +18,7 @@ class Room(models.Model):
     beds = models.IntegerField(default=0)
     checkin = models.DateField(auto_now_add=False, null=True, blank=True)
     checkout = models.DateField(auto_now_add=False, null=True, blank=True)
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=True)
     img = models.ImageField(upload_to='booking/img/room', blank=True, null=True)
     slide1 = models.ImageField(upload_to='booking/img/room-slide', blank=True, null=True)
     slide2 = models.ImageField(upload_to='booking/img/room-slide', blank=True, null=True)

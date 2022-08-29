@@ -20,25 +20,32 @@ def searching_rooms(request):
         capacity = int(request.POST['adults']) + int(request.POST['kids'])
         rooms_before = Room.objects.filter(checkout__lte=checkin, capacity__gte=capacity)
         rooms_after = Room.objects.filter(checkin__gte=checkout, capacity__gte=capacity)
-    return rooms_after.union(rooms_before)
+        return rooms_after.union(rooms_before)
+    else: return False
 
 
 def home(request):
     if request.method == 'POST' and 'search' in request.POST:
-        return render(request, 'room_list.html', {'room_list': searching_rooms(request)})
+        room_list = searching_rooms(request)
+        if room_list:
+            return render(request, 'room_list.html', {'room_list': room_list})
     room_list = Room.objects.all()
     return render(request, 'room_list_main.html', {'room_list': room_list})
 
 def room_list(request):
     if request.method == 'POST' and 'search' in request.POST:
-        return render(request, 'room_list.html', {'room_list': searching_rooms(request)})
-    if request.method == 'GET':
-        room_list = Room.objects.all()
-        return render(request, 'room_list.html', {'room_list': room_list})
+        room_list = searching_rooms(request)
+        if room_list:
+            return render(request, 'room_list.html', {'room_list': room_list})
+    room_list = Room.objects.all()
+    return render(request, 'room_list.html', {'room_list': room_list})
+
 
 def booking(request):
     if request.method == 'POST' and 'search' in request.POST:
-        return render(request, 'room_list.html', {'room_list': searching_rooms(request)})
+        room_list = searching_rooms(request)
+        if room_list:
+            return render(request, 'room_list.html', {'room_list': room_list})
     return render(request, 'booking.html')
 
 def aboutus(request):
