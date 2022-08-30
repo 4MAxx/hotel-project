@@ -1,0 +1,1 @@
+$(function () {$("#searchForm input, #searchForm select").not("[type=submit]").jqBootstrapValidation(); } );

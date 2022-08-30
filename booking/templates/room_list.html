@@ -1,9 +1,28 @@
-{% extends 'base_for_rooms.html' %}
+{% extends 'base_other.html' %}
+
+{% block title %}Гостишка | Апартаменты и люксы{% endblock %}
 
 {% block content %}
         <!-- Room Section Start -->
         <div id="rooms">
-            <div class="container">                
+            <div class="container">
+                {% if data.result == True %}
+                    <div class="section-header">
+                        <h2>Найдено: {{ room_list|length }} свободных номеров</h2>
+                        {% if room_list|length == 0 %}
+                            <p>Измените условия поиска, т.к. свободные номера на искомые даты <b style="color: red;">отсутствуют.</b> </p>
+                        {% else %}
+                            <p>Свободные номера по Вашему запросу</p>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="section-header">
+                        <h2>Апартаменты & люксы</h2>
+                        <p>
+                            От простых апартаментов до люкса
+                        </p>
+                    </div>                
+                {% endif %}                
                 <div class="row">
                     {% for room in room_list %}
                     

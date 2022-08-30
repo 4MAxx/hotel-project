@@ -3,14 +3,14 @@
 {% load static %}
     <head>
         <meta charset="utf-8">
-        <title>Итоговый проект | Гостишка</title>
+        <title>{% block title %}{% endblock %}</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <meta content="" name="keywords">
         <meta content="" name="description">
 
         <!-- Favicons -->
-        <link href="media/booking/img/favicon.ico" rel="icon">
-        <link href="media/booking/img/apple-favicon.png" rel="apple-touch-icon">
+        <link href="../media/booking/img/favicon.png" rel="icon">
+        <link href="../media/booking/img/apple-favicon.png" rel="apple-touch-icon">
 
         <!-- Google Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Raleway:100,200,300,400,500,600,700,800,900" rel="stylesheet"> 
@@ -28,43 +28,45 @@
     </head>
 
     <body>
+        
         <!-- Header Section Start -->
         <header id="header">
-            <a href="{% url 'home' %}" class="logo"><img src="media/booking/img/logo.png" alt="logo"></a>
+            <a href="{% url 'home' %}" class="logo"><img src="../media/booking/img/logo.png" alt="logo"></a>
             <div class="phone"><i class="fa fa-phone"></i>+375 29 862-01-28</div>
             <div class="mobile-menu-btn"><i class="fa fa-bars"></i></div>
             <nav class="main-menu top-menu">
                 <ul>
-                    <li class="active"><a href="{% url 'home' %}">Главная</a></li>
-                    <li><a href="{% url 'aboutus' %}">О нас</a></li>
-                    <li><a href="{% url 'rooms' %}">Номера</a></li>
-                    <li><a href="{% url 'amenities' %}">Удобства</a></li>
-                    <li><a href="{% url 'booking' %}">Бронирование</a></li>
-                    <li><a href="{% url 'login' %}">Логин</a></li>
-                    <li><a href="{% url 'contact' %}">Контакты</a></li>
+                    <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><a href="{% url 'home' %}">Главная</a></li>
+                    <li class="{% if request.resolver_match.url_name == 'aboutus' %}active{% endif %}"><a href="{% url 'aboutus' %}">О нас</a></li>
+                    <li class="{% if request.resolver_match.url_name == 'rooms' %}active{% endif %}"><a href="{% url 'rooms' %}">Номера</a></li>
+                    <li class="{% if request.resolver_match.url_name == 'amenities' %}active{% endif %}"><a href="{% url 'amenities' %}">Удобства</a></li>
+                    <li class="{% if request.resolver_match.url_name == 'booking' %}active{% endif %}"><a href="{% url 'booking' %}">Бронирование</a></li>
+                    <li class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}"><a href="{% url 'login' %}">Логин</a></li>
+                    <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><a href="{% url 'contact' %}">Контакты</a></li>
                 </ul>
             </nav>
         </header>
         <!-- Header Section End -->
         
-                
+        
+        {% if search == True %}        
         <!-- Search Section Start -->
         <div id="search" style="background: #f2f2f2;">
             <div class="container">
-                <form method="post">
+                <form method="post" id="searchForm">
                 {% csrf_token %}
                 <div class="form-row">                   
                 
                     <div class="control-group col-md-3">
                         <label>Заселение</label>
                         <div class="form-group">
-                            <div class="input-group date" id="date-5" data-target-input="nearest">
-                                
-                                <input type="text" class="form-control datetimepicker-input" data-target="#date-5" name="checkin" value="checkin" />
+                            <div class="input-group date" id="date-5" data-target-input="nearest">                                
+                                <input type="text" class="form-control datetimepicker-input" data-target="#date-5" name="checkin" id="checkin" value="{{ data.ci }}"  data-validation-required-message="требуется дата" />
                                 <div class="input-group-append" data-target="#date-5" data-toggle="datetimepicker">
                                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                 </div>
                             </div>
+                            <p class="help-block text-danger"></p>
                         </div>
                     </div>
                     
@@ -72,11 +74,12 @@
                         <label>Убытие</label>
                         <div class="form-group">
                             <div class="input-group date" id="date-6" data-target-input="nearest">                                
-                                <input type="text" class="form-control datetimepicker-input" data-target="#date-6" name="checkout" value="checkout"/>
+                                <input type="text" class="form-control datetimepicker-input" data-target="#date-6" name="checkout" id="checkout" value="{{ data.co }}"  data-validation-required-message="требуется дата"/>                                
                                 <div class="input-group-append" data-target="#date-6" data-toggle="datetimepicker">
                                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                </div>
+                                </div>                               
                             </div>
+                             <p class="help-block text-danger"></p>
                         </div>
                     </div>
                     
@@ -85,22 +88,30 @@
 
                             <div class="control-group col-md-6">
                                 <label>Взрослые</label>
-                                <select class="custom-select" name="adults" value="adults">
-                                    <option selected>0</option>
+                                <select class="custom-select" name="adults" id="adults" value="" data-validation-required-message="хотя бы 1">
+                                    {% if data.ad %}
+                                        <option selected>{{ data.ad }}</option>
+                                    {% else %}
+                                        <option selected></option>
+                                    {% endif %}
                                     <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    
+                                    <option value="2">2</option>                                    
                                 </select>
+                                <p class="help-block text-danger"></p>
                             </div>
                             
                             <div class="control-group col-md-6 control-group-kid">
                                 <label>Дети</label>
-                                <select class="custom-select" name="kids" value="kids">
-                                    <option selected>0</option>
+                                <select class="custom-select" name="kids" id="kids" value="{{ data.kid }}" >
+                                    {% if data.ad %}
+                                        <option selected>{{ data.kid }}</option>
+                                    {% else %}
+                                        <option selected>0</option>
+                                    {% endif %}
                                     <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    
+                                    <option value="2">2</option>                                    
                                 </select>
+                                
                             </div>
                         </div>
                     </div>
@@ -108,7 +119,7 @@
                     <div class="control-group col-md-3">
                         <form method="post">
                         {% csrf_token %}
-                        <button class="btn btn-block" name="search">Поиск</button>
+                        <button class="btn btn-block" name="search" id="searchButton" type="submit">Поиск</button>
                         </form>
                     </div>
                        
@@ -117,41 +128,12 @@
             </div>
         </div>
         <!-- Search Section End -->
+        {% endif %}
         
-        {% block content %}
-        
+        {% block content %}        
         {% endblock content %}
         
-                
-        <!-- Footer Section Start -->
-        <div id="footer">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="social">
-                            <a href=""><li class="fa fa-instagram"></li></a>
-                            <a href=""><li class="fa fa-telegram"></li></a>
-                            <a href=""><li class="fa fa-facebook-f"></li></a>
-                            <a href=""><li class="fa fa-vk"></li></a>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <ul>
-                            <li><a href="{% url 'home' %}">Главная</a></li>
-                            <li><a href="{% url 'aboutus' %}">О нас</a></li>                            
-                            <li><a href="{% url 'contact' %}">Контакты</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-12">
-                        <p>Copyright &#169; <a href="">4MAxx</a> All Rights Reserved.</p>
-						<p>Template By <a href="">4Maxx</a></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Footer Section End -->
-        
-        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+        {% include "footer.html" %}
         
         <!-- Vendor JavaScript File -->
         <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
@@ -169,6 +151,7 @@
         
         <!-- Booking Javascript File -->
         <script src="{% static 'js/booking.js' %}"></script>
+        <script src="{% static 'js/search.js' %}"></script>
         <script src="{% static 'js/jqBootstrapValidation.min.js' %}"></script>
   
         <!-- Main Javascript File -->
