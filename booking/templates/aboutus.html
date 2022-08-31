@@ -1,4 +1,5 @@
 {% extends 'base_other.html' %}
+{% load static %}
 
 {% block title %}Гостишка | Наш блог{% endblock %}
 
@@ -16,7 +17,7 @@
                 <div class="row">
                     <div class="col-md-6 img-cols">
                         <div class="img-col">
-                            <img class="img-fluid" src="../media/booking/img/about/about-1.jpg">
+                            <img class="img-fluid" src="{% static 'img/about/about-1.jpg' %}">
                         </div>
                     </div>
                     <div class="col-md-6 content-cols">
@@ -33,7 +34,7 @@
                 <div class="row">
                     <div class="col-md-6 img-cols d-block d-md-none">
                         <div class="img-col">
-                            <img class="img-fluid" src="../media/booking/img/about/about-2.jpg">
+                            <img class="img-fluid" src="{% static 'img/about/about-2.jpg' %}">
                         </div>
                     </div>
                     <div class="col-md-6 content-cols">
@@ -47,7 +48,7 @@
                     </div>
                     <div class="col-md-6 img-cols d-none d-md-block">
                         <div class="img-col">
-                            <img class="img-fluid" src="../media/booking/img/about/about-2.jpg">
+                            <img class="img-fluid" src="{% static 'img/about/about-2.jpg' %}">
                         </div>
                     </div>
                 </div>
@@ -55,7 +56,7 @@
                 <div class="row">
                     <div class="col-md-6 img-cols">
                         <div class="img-col">
-                            <img class="img-fluid" src="../media/booking/img/about/about-3.jpg">
+                            <img class="img-fluid" src="{% static 'img/about/about-3.jpg' %}">
                         </div>
                     </div>
                     <div class="col-md-6 content-cols">

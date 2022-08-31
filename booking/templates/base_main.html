@@ -9,8 +9,8 @@
         <meta content="" name="description">
 
         <!-- Favicons -->
-        <link href="media/booking/img/favicon.png" rel="icon">
-        <link href="media/booking/img/apple-favicon.png" rel="apple-touch-icon">
+        <link href="{% static 'img/favicon.png' %}" rel="icon">
+        <link href="{% static 'img/apple-favicon.png' %}" rel="apple-touch-icon">
 
         <!-- Google Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700|Raleway:100,200,300,400,500,600,700,800,900" rel="stylesheet"> 
@@ -30,7 +30,7 @@
     <body>
         <!-- Header Section Start -->
         <header id="header">
-            <a href="{% url 'home' %}" class="logo"><img src="media/booking/img/logo.png" alt="logo"></a>
+            <a href="{% url 'home' %}" class="logo"><img src="{% static '/img/logo.png' %}" alt="logo"></a>
             <div class="phone"><i class="fa fa-phone"></i>+375 29 862-01-28</div>
             <div class="mobile-menu-btn"><i class="fa fa-bars"></i></div>
             <nav class="main-menu top-menu">
@@ -122,15 +122,15 @@
                 </ol>
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                        <img src="media/booking/img/slider/header-slider-1.jpg" alt="Гостишка">
+                        <img src="{% static 'img/slider/header-slider-1.jpg' %}" alt="Гостишка">
                     </div>
 
                     <div class="carousel-item">
-                        <img src="media/booking/img/slider/header-slider-2.jpg" alt="Гостишка">
+                        <img src="{% static 'img/slider/header-slider-2.jpg' %}" alt="Гостишка">
                     </div>
 
                     <div class="carousel-item">
-                        <img src="media/booking/img/slider/header-slider-3.jpg" alt="Гостишка">
+                        <img src="{% static 'img/slider/header-slider-3.jpg' %}" alt="Гостишка">
                     </div>
                 </div>
 
