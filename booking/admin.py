@@ -1,7 +1,10 @@
 from django.contrib import admin
 
 # Register your models here.
-from booking.models import Category, Room, Booking
+from django.contrib.auth.admin import UserAdmin
+from .forms import CustomUserCreationForm, CustomUserChangeForm
+
+from booking.models import Category, Room, Booking, CustomUser
 
 
 @admin.register(Booking)
@@ -29,3 +32,30 @@ class RoomAdmin(admin.ModelAdmin):
                     'text']
 
 admin.site.register(Category)
+
+
+@admin.register(CustomUser)
+class CustomUserAdmin(UserAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = CustomUser
+    list_display = ['email',
+                    'is_vip',
+                    'last_name',
+                    'first_name',
+                    'phone',
+                    'is_staff',
+                    ]
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        ('Права', {'fields': ('is_staff', 'is_active', 'groups')}),
+        ('Персональная информация', {'fields': ('last_name', 'first_name', 'phone', 'gender')})
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active', 'groups')}
+         ),
+    )
+    search_fields = ('email',)
+    ordering = ('email',)

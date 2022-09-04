@@ -8,57 +8,95 @@
         <div id="login">
             <div class="container">
                 <div class="section-header">
-                    <h2>Регистрация / Вход</h2>
+                    {% if mode == 'registr' %}
+                    <h2>Регистрация</h2>
                     <p>
-                        Чтобы воспользоваться услугами на сайте требуется пройти регистрацию или войти в профиль 
+                        Чтобы воспользоваться услугами на сайте требуется пройти регистрацию 
                     </p>
+                    {% else %}
+                    <h2>Вход</h2>
+                    <p>
+                        Чтобы воспользоваться услугами на сайте требуется войти в профиль или пройти регистрацию
+                    </p>
+                    {% endif %}
                 </div>
                 <div class="row">
+                    {% if mode == 'registr' %}
                     <div class="col-md-6">
                         <div class="login-form">
-                            <form>
-                                <div class="form-row">
-                                    <div class="control-group col-sm-6">
-                                        <label>Имя</label>
-                                        <input type="text" class="form-control" required="required" />
-                                    </div>
+                            <form method="POST">
+                                {% csrf_token %}                                
+                                <div class="form-row">                                    
                                     <div class="control-group col-sm-6">
                                         <label>Email</label>
-                                        <input type="email" class="form-control" required="required" />
+                                        <input type="email" class="form-control" required="required" name="email"/>
+                                    </div>
+                                    <div class="control-group col-sm-6">
+                                        <label>Телефон</label>
+                                        <input type="text" class="form-control" required="required" name="phone"/>
+                                    </div>
+                                    {% if form.errors.email %}
+                                    <div class="alert alert-danger" role="alert">
+                                    {{ form.errors.email }}
+                                    </div> 
+                                    {% endif %}                                   
+                                    <div class="control-group col-sm-6">
+                                        <label>Имя</label>
+                                        <input type="text" class="form-control" required="required" name="first_name"/>
+                                    </div>
+                                    <div class="control-group col-sm-6">
+                                        <label>Фамилия</label>
+                                        <input type="text" class="form-control" required="required" name="last_name"/>
                                     </div>
                                 </div>
                                 <div class="form-row">
                                     <div class="control-group col-sm-6">
                                         <label>Пароль</label>
-                                        <input type="password" class="form-control" required="required" />
+                                        <input type="password" class="form-control" required="required" name="password1"/>
                                     </div>
                                     <div class="control-group col-sm-6">
                                         <label>Повторите пароль</label>
-                                        <input type="password" class="form-control" required="required" />
+                                        <input type="password" class="form-control" required="required" name="password2"/>
                                     </div>
+                                    {% if form.errors.password2 %}
+                                    <div class="alert alert-danger" role="alert">
+                                    {{ form.errors.password2 }}
+                                    </div>
+                                    {% endif %}                                     
                                 </div>
-                                <div class="button"><button type="submit">Регистрация</button></div>
+                                <div class="button"><button type="submit" name="registr">Регистрация</button></div>
                             </form>
                         </div>
                     </div>
-                    
+                    {% else %}                    
                     <div class="col-md-6">
                         <div class="login-form">
-                            <form>
+                            <form method="POST">
+                                {% csrf_token %}
+                                {% if access == 'denided' %}
+                                <div class="alert alert-danger" role="alert">
+                                    Введите корректные данные профиля!
+                                </div>
+                                {% endif %}                                
                                 <div class="form-row">
                                     <div class="control-group col-sm-6">
                                         <label>Email</label>
-                                        <input type="email" class="form-control" required="required" />
-                                    </div>
+                                        <input type="text" class="form-control" required="required" name="email" />
+                                    </div>                                    
+                                </div>
+                                <div class="form-row">                                    
                                     <div class="control-group col-sm-6">
                                         <label>Пароль</label>
-                                        <input type="password" class="form-control" required="required" />
+                                        <input type="password" class="form-control" required="required" name="password" />
                                     </div>
                                 </div>
                                 <div class="button"><button type="submit">Вход</button></div>
+                                <a href="{% url 'registr' %}"><b>Регистрация</b></a>                                
                             </form>
-                        </div>
+                        </div>                        
                     </div>
+                    
+                    {% endif %}
                 </div>
             </div>
         </div>

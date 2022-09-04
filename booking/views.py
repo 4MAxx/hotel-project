@@ -1,10 +1,16 @@
 from datetime import datetime
 
-from django.shortcuts import render
+from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
+from django.shortcuts import render, redirect
 
 # Create your views here.
-from booking.forms import SearchForm
+from booking.forms import SearchForm, CustomUserCreationForm
 from booking.models import Room
+
+# Флаги контекста
+# search = True/False  - необходимо рендерить шаблон с секцией поиска свободных номеров или без
 
 # класс с данными от предыдущего поиска (чтобы подтягивать в форму при рендеринге результатов)
 class SearchFormData():
@@ -51,7 +57,6 @@ def home(request):
 
 # вьюшка страницы с "Обзорный список номеров" (либо целиком либо с результатами поиска)
 def room_list(request):
-    # search = True       флаг - необходимо рендерить с секцией поиска свободных номеров
     if request.method == 'POST' and 'search' in request.POST:
         room_list = searching_rooms(request)
         if room_list != False:
@@ -61,7 +66,6 @@ def room_list(request):
 
 # вьюшка страницы "Бронирование"
 def booking(request):
-    # search = True  # флаг - необходимо рендерить с секцией поиска свободных номеров
     if request.method == 'POST' and 'search' in request.POST:
         room_list = searching_rooms(request)
         if room_list != False:
@@ -70,20 +74,51 @@ def booking(request):
 
 # вьюшка страницы "О нас"
 def aboutus(request):
-    # search = False       # флаг - необходимо рендерить без секции поиска свободных номеров
     return render(request, 'aboutus.html', {'search': False})
 
 # вьюшка страницы "Сервис и удобства"
 def amenities(request):
-    # search = False       # флаг - необходимо рендерить без секции поиска свободных номеров
     return render(request, 'amenities.html', {'search': False})
 
 # вьюшка страницы "Контакты"
 def contact(request):
-    # search = False       # флаг - необходимо рендерить без секции поиска свободных номеров
     return render(request, 'contact.html', {'search': False})
 
 # вьюшка страницы "Логин"
-def login(request):
-    # search = False       # флаг - необходимо рендерить без секции поиска свободных номеров
-    return render(request, 'login.html', {'search': False})
+def mylogin(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('profile', user.pk)
+        else: return render(request, 'login.html', {'access': 'denided'})
+    return render(request, 'login.html', {'search': False, 'mode':'login'})
+
+# вьюшка страницы "Логаут"
+def mylogout(request):
+    logout(request)
+    return redirect('login')
+
+# вьюшка страницы "Регистрация"
+def registr(request):
+    if request.method == 'POST' :
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.save()
+            user_group = Group.objects.get(name='Гость')
+            user.groups.add(user_group)
+            login(request, user)
+            return redirect('profile', user.pk)
+        else:
+            print('not valid', form.errors)
+            return render(request, 'login.html', {'search': False, 'mode':'registr', 'form': form})
+
+    return render(request, 'login.html', {'search': False, 'mode':'registr'})
+
+# вьюшка страницы "Профиль гостя"
+@login_required
+def profile(request, pk):
+    return render(request, 'profile.html', {'search': False, 'access': 'success'})

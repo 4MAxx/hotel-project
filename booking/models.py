@@ -1,9 +1,14 @@
 import datetime
 
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import Group, AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
+from booking.managers import CustomUserManager
+
+
 class Category(models.Model):
     class Meta:
         verbose_name = 'Категории номеров'
@@ -25,7 +30,7 @@ class Room(models.Model):
     text = models.TextField(max_length=500, verbose_name = 'Описание номера')
     price = models.IntegerField(default=0, verbose_name = 'Цена')
     size = models.IntegerField(default=0, verbose_name = 'Площадь')
-    capacity = models.IntegerField(default=0, verbose_name = 'Вместииость')
+    capacity = models.IntegerField(default=0, verbose_name = 'Вместимость')
     beds = models.IntegerField(default=0, verbose_name = 'Кроватей')
     checkin = models.DateField(auto_now_add=False, null=True, blank=True, verbose_name = 'Заселение')
     checkout = models.DateField(auto_now_add=False, null=True, blank=True, verbose_name = 'Убытие')
@@ -38,6 +43,7 @@ class Room(models.Model):
     def __str__(self):
         return f'{str(self.number)} - {self.category}'
 
+
 class Booking(models.Model):
     class Meta:
         verbose_name = 'Бронирование'
@@ -49,7 +55,8 @@ class Booking(models.Model):
                 ('3', 'cancel'),
                 ('4', 'expire'),
                 ('5', 'success')]
-    user = models.ForeignKey(User, on_delete=models.PROTECT, null=False, blank=False, verbose_name = 'Гость')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=False, blank=False,
+                             verbose_name = 'Гость')
     special = models.CharField(max_length=1000, blank=True, null=True, verbose_name = 'Особые пожелания')
     date_of_book = models.DateField(auto_now_add=True, null=False, blank=False, verbose_name = 'Дата бронирования')
     room = models.ForeignKey(Room, on_delete=models.PROTECT, null=False, blank=False, verbose_name = 'Номер')
@@ -66,3 +73,22 @@ class Booking(models.Model):
         if self.deadline_conf is None:
             self.deadline_conf = datetime.datetime.now().date() + datetime.timedelta(days=1)
         super(Booking, self).save(*args, **kwargs)
+
+
+class CustomUser(AbstractUser):
+    username = None
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
+
+    GENDERS = (('м', 'мужской'),
+                ('ж', 'женский'),)
+    email = models.EmailField(_('email address'), unique=True)
+    is_vip = models.BooleanField(default=False, verbose_name = 'VIP')
+    phone = models.CharField(max_length=20,blank=True, null=True, verbose_name = 'Телефон')
+    gender = models.CharField(max_length=1, choices=GENDERS, default='', verbose_name = 'Пол')
+    # adress = models.CharField(max_length=200, blank=True, null=True, verbose_name = 'Адрес проживания')
+
+    def __str__(self):
+        return self.email

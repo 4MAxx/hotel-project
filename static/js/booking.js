@@ -1,3 +1,5 @@
+$(function () {$("#bookingForm input, #bookingForm select").not("[type=submit]").jqBootstrapValidation(); } );
+/*
 $(function () { 
 
     $("#bookingForm input, #bookingForm select").jqBootstrapValidation({
@@ -78,3 +80,4 @@ $(function () {
 $('#name').focus(function () {
     $('#success').html('');
 });
+*/

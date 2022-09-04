@@ -29,22 +29,7 @@
 
     <body>
         <!-- Header Section Start -->
-        <header id="header">
-            <a href="{% url 'home' %}" class="logo"><img src="{% static '/img/logo.png' %}" alt="logo"></a>
-            <div class="phone"><i class="fa fa-phone"></i>+375 29 862-01-28</div>
-            <div class="mobile-menu-btn"><i class="fa fa-bars"></i></div>
-            <nav class="main-menu top-menu">
-                <ul>
-                    <li class="active"><a href="{% url 'home' %}">Главная</a></li>
-                    <li><a href="{% url 'aboutus' %}">О нас</a></li>
-                    <li><a href="{% url 'rooms' %}">Номера</a></li>
-                    <li><a href="{% url 'amenities' %}">Удобства</a></li>
-                    <li><a href="{% url 'booking' %}">Бронирование</a></li>
-                    <li><a href="{% url 'login' %}">Логин</a></li>
-                    <li><a href="{% url 'contact' %}">Контакты</a></li>
-                </ul>
-            </nav>
-        </header>
+        {% include "header_nav.html" %}        
         <!-- Header Section End -->
         
         <!-- Header Bottom Start -->
@@ -320,88 +305,7 @@
         <!-- Subscribe Section End -->
         
         <!-- Booking Section Start -->
-        <div id="booking">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Бронирование</h2>
-                    <p>
-                        Оставте заявку и мы предложим подходящий вариант
-                    </p>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="booking-form">
-                            <div id="success"></div>
-                            <form name="sentMessage" id="bookingForm" novalidate="novalidate">
-                                <div class="form-row">
-                                    <div class="control-group col-sm-6">
-                                        <label>Имя</label>
-                                        <input type="text" class="form-control" id="fname" placeholder="E.g. John" required="required" data-validation-required-message="Please enter first name" />
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                    <div class="control-group col-sm-6">
-                                        <label>Фамилия</label>
-                                        <input type="text" class="form-control" id="lname" placeholder="E.g. Sina" required="required" data-validation-required-message="Please enter last name" />
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="control-group col-sm-6">
-                                        <label>Телефон</label>
-                                        <input type="text" class="form-control" id="mobile" placeholder="E.g. +1 234 567 8900" required="required" data-validation-required-message="Please enter your mobile number" />
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                    <div class="control-group col-sm-6">
-                                        <label>Email</label>
-                                        <input type="email" class="form-control" id="email" placeholder="E.g. email@example.com" required="required" data-validation-required-message="Please enter your email" />
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="control-group col-sm-6">
-                                        <label>Заселение</label>
-                                        <input type="text" class="form-control datetimepicker-input" id="date-1" data-toggle="datetimepicker" data-target="#date-1" placeholder="E.g. MM/DD/YYYY" required="required" data-validation-required-message="Please enter date"/>
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                    <div class="control-group col-sm-6">
-                                        <label>Убытие</label>
-                                        <input type="text" class="form-control datetimepicker-input" id="date-2" data-toggle="datetimepicker" data-target="#date-2" placeholder="E.g. MM/DD/YYYY" required="required" data-validation-required-message="Please enter date"/>
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="control-group col-sm-6">
-                                        <label>Взрослые</label>
-                                        <select class="custom-select" id="adult" required="required" data-validation-required-message="Please select one"/>
-                                            <option value="0">0</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>                                            
-                                        </select>
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                    <div class="control-group col-sm-6">
-                                        <label>Дети</label>
-                                        <select class="custom-select" id="kid" required="required" data-validation-required-message="Please select one"/>
-                                            <option value="0">0</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            
-                                        </select>
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                </div>
-                                <div class="control-group">
-                                    <label>Предпочтения и пожелания</label>
-                                    <input type="text" class="form-control" id="request" placeholder="E.g. Special Request" required="required" data-validation-required-message="Please enter your special request" />
-                                    <p class="help-block text-danger"></p>
-                                </div>
-                                <div class="button"><button type="submit" id="bookingButton">Забронируй сейчас</button></div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
         <!-- Booking Section End -->
         
         <!-- Call Section Start -->
