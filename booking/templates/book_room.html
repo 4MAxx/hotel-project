@@ -1,38 +1,15 @@
-{% extends main|yesno:"base_main.html,base_other.html" %}
 
-{% block title %}Гостишка | Апартаменты и люксы{% endblock %}
-
-
-{% block content %}
         <!-- Room Section Start -->
         <div id="rooms">
-            <div class="container">
-                {% if main %}
-                    <div class="section-header">
-                    <h2>Апартаменты & люксы</h2>
-                        <p>
-                            На любой вкус
-                        </p>
-                    </div>
-                {% else %}
-                    {% if data.result == True %}
-                        <div class="section-header">
-                            <h2>Найдено: {{ room_list|length }} свободных номеров</h2>
-                            {% if room_list|length == 0 %}
-                                <p>Измените условия поиска, т.к. свободные номера на искомые даты <b style="color: red;">отсутствуют.</b> </p>
-                            {% else %}
-                                <p>Свободные номера по Вашему запросу</p>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <div class="section-header">
-                            <h2>Апартаменты & люксы</h2>
-                            <p>
-                                От простых апартаментов до люкса
-                            </p>
-                        </div>                
-                    {% endif %}
-                {% endif %}                
+            <div class="container">                
+                
+                <div class="section-header">
+                    <h2>в шаге от завершения</h2>                            
+                        <p>Выш выбор</p>
+                    
+                </div>            
+                         
+                             
                 <div class="row">
                     {% for room in room_list %}
                     
@@ -45,7 +22,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="room-des">
-                                    <h3>{{room.number}}-{{ room.category }}</h3>
+                                    <h3>{{ room.category }}</h3>
                                     <h1>${{ room.price }}<span>/ Ночь</span></h1>
                                     <ul class="room-size">
                                         <li><i class="fa fa-arrow-right"></i>Размер: {{ room.size }} м2 </li>
@@ -64,8 +41,7 @@
                                         <li class="icon-10"></li>
                                     </ul>
                                     <div class="room-link">
-                                        <a href="#" data-toggle="modal" data-target="#modal-id{{ forloop.counter }}">Подробнее</a>
-                                        <a href="{% url 'create_book' pk=room.pk %}">Забронируй сейчас</a>
+                                        <a href="#" data-toggle="modal" data-target="#modal-id{{ forloop.counter }}">Подробнее</a>                                        
                                     </div>
                                 </div>
                             </div>
@@ -109,9 +85,7 @@
                                 <p>
                                     {{ room.text }}
                                 </p>
-                                <div class="modal-link">
-                                    <a href="{% url 'create_book' pk=room.pk %}">Забронируй сейчас</a>
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -121,4 +95,3 @@
         
         {% endfor %}
         <!-- Modal for Room Section End -->
-{% endblock %}

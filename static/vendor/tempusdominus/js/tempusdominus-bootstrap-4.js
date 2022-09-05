@@ -124,7 +124,7 @@ var DateTimePicker = function ($, moment) {
         maxDate: false,
         useCurrent: true,
         collapse: true,
-        locale: moment.locale(),
+        locale: 'ru',
         defaultDate: false,
         disabledDates: false,
         enabledDates: false,

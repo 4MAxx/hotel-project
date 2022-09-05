@@ -1,0 +1,84 @@
+<!-- Booking Section Start -->
+        <div id="booking">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Бронирование</h2>
+                    <p>
+                        Оставте заявку и мы предложим подходящий вариант
+                    </p>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="booking-form">
+                            <div id="success"></div>
+                            <form name="sentMessage" id="bookingForm" novalidate="novalidate" method="POST">
+                            	{% csrf_token %}
+                                <div class="form-row">
+                                    <div class="control-group col-sm-6">
+                                        <label>Фамилия</label>
+                                        <input type="text" class="form-control" id="lname" placeholder="Иванов" required="required" data-validation-required-message="Пожалуйста введите фамилию" name="last_name"/>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                    <div class="control-group col-sm-6">
+                                        <label>Имя</label>
+                                        <input type="text" class="form-control" id="fname" placeholder="Иван" required="required" data-validation-required-message="Пожалуйста введите имя" name="first_name"/>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="control-group col-sm-6">
+                                        <label>Телефон</label>
+                                        <input type="text" class="form-control" id="mobile" placeholder="+375296000000" required="required" data-validation-required-message="Пожалуйста введите телефон" name="phone"/>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                    <div class="control-group col-sm-6">
+                                        <label>Email</label>
+                                        <input type="email" class="form-control" id="email" placeholder="email@example.com" required="required" data-validation-required-message="Пожалуйста введите свой email" name="email"/>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="control-group col-sm-6">
+                                        <label>Заселение</label>
+                                        <input type="text" class="form-control datetimepicker-input" id="date-1" data-toggle="datetimepicker" data-target="#date-1" placeholder="ММ/ДД/ГГГГ" required="required" data-validation-required-message="Пожалуйста введите дату заселения"/>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                    <div class="control-group col-sm-6">
+                                        <label>Убытие</label>
+                                        <input type="text" class="form-control datetimepicker-input" id="date-2" data-toggle="datetimepicker" data-target="#date-2" placeholder="ММ/ДД/ГГГГ" required="required" data-validation-required-message="Пожалуйста введите дату убытия"/>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="control-group col-sm-6">
+                                        <label>Взрослые</label>
+                                        <select class="custom-select" id="adult" required="required" data-validation-required-message="хотя бы 1"/>
+                                            <option selected></option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>                                            
+                                        </select>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                    <div class="control-group col-sm-6">
+                                        <label>Дети</label>
+                                        <select class="custom-select" id="kid" required="required" data-validation-required-message="Please select one"/>
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>                                            
+                                        </select>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Пожелания и предпочтения</label>
+                                    <input type="text" class="form-control" id="request" placeholder="особые пожелания" required="required" data-validation-required-message="Введите особые пожелания" />
+                                    <p class="help-block text-danger"></p>
+                                </div>
+                                <div class="button"><button type="submit" id="bookingButton">Забронировать</button></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Booking Section End -->

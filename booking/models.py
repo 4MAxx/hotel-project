@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 from booking.managers import CustomUserManager
+from django.shortcuts import redirect
 
 
 class Category(models.Model):
@@ -59,20 +60,51 @@ class Booking(models.Model):
                              verbose_name = 'Гость')
     special = models.CharField(max_length=1000, blank=True, null=True, verbose_name = 'Особые пожелания')
     date_of_book = models.DateField(auto_now_add=True, null=False, blank=False, verbose_name = 'Дата бронирования')
-    room = models.ForeignKey(Room, on_delete=models.PROTECT, null=False, blank=False, verbose_name = 'Номер')
+    room = models.ForeignKey(Room, on_delete=models.PROTECT, null=False, blank=False, verbose_name = 'Номер', related_name='rooms')
     checkin = models.DateField(auto_now_add=False, null=False, blank=False, verbose_name = 'Заселение')
     checkout = models.DateField(auto_now_add=False, null=False, blank=False, verbose_name = 'Убытие')
-    status_conf = models.CharField(max_length=1, choices=STATUSES, default='1', verbose_name = 'Статус брони')
+    adults = models.IntegerField(default=1, verbose_name = 'Взрослых')
+    kids = models.IntegerField(default=0, verbose_name='Детей')
+    status_conf = models.CharField(max_length=1, choices=STATUSES, default='2', verbose_name = 'Статус брони')
     deadline_conf = models.DateField(blank=True, null=True, verbose_name = 'Срок оплаты')
     date_of_conf = models.DateField(blank=True, null=True, verbose_name = 'Дата оплаты')
 
     def __str__(self):
         return f'№: {self.room} - Статус: {self.get_status_conf_display()}'
 
+    def check_dates(self):
+        '''
+            вызывает исключение если пересекаются даты бронирования (например, из админки)
+        '''
+        db_room = Booking.objects.filter(room=self.room.pk)
+        if db_room:
+            for i in db_room:
+                if (i.checkout <= self.checkin and i.checkout < self.checkout) or \
+                    (i.checkin >= self.checkout and i.checkin > self.checkin):
+                    pass
+                else:
+                    return False
+
+        return True
+
+
+        # r_after = db_room.objects.filter(checkout__lte=self.checkin)
+        # if not r_after:
+        #     r_befor = db_room.objects.filter(checkin__gte=self.checkout)
+        #     if r_befor: return True
+        # if (self.checkin < db_room.checkin and self.checkout <= db_room.checkin) or \
+        #         (self.checkin >= db_room.checkout and self.checkout > db_room.checkout):
+        #     return True
+
+
     def save(self, *args, **kwargs):
         if self.deadline_conf is None:
             self.deadline_conf = datetime.datetime.now().date() + datetime.timedelta(days=1)
+        if self.check_dates() == False:
+            raise ValueError('Допущено пересечение дат по бронированию')
         super(Booking, self).save(*args, **kwargs)
+
+
 
 
 class CustomUser(AbstractUser):
@@ -91,4 +123,6 @@ class CustomUser(AbstractUser):
     # adress = models.CharField(max_length=200, blank=True, null=True, verbose_name = 'Адрес проживания')
 
     def __str__(self):
-        return self.email
+        if self.first_name and self.last_name:
+            return f'{self.last_name} {self.first_name[0]}. - {self.email}'
+        else: return self.email

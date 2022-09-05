@@ -1,0 +1,29 @@
+{% extends 'base_other.html' %}
+
+{% block content %}
+        <!-- Room Section Start -->
+        <div id="booking">
+            <div class="container">
+                <div class="section-header">
+                    <h2>{{ user.first_name }}, поздравляем! <span class="text-success">Бронирование успешно</span></h2>
+                    <p>
+                        у Вас есть сутки чтобы подтвердить бронирование
+                    </p>
+                    
+                </div>
+                <div class="row">
+                        <div class="col-md-12">
+                            <a href="{% url 'profile' pk=user.pk %}" >
+                                <div class="button" style="text-align: center;"><button type="submit">Перейти в профиль</button></div>
+                            </a>
+                            
+                          
+                        </div>
+                    
+                    </div>
+               
+            </div>
+        </div>
+        <!-- Room Section End -->
+        
+{% endblock %}

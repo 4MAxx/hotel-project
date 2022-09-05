@@ -11,13 +11,16 @@ from booking.models import Category, Room, Booking, CustomUser
 class BookAdmin(admin.ModelAdmin):
     list_display = ['room',
                     'user',
-                    'date_of_book',
                     'checkin',
                     'checkout',
+                    'adults',
+                    'kids',
                     'status_conf',
+                    'date_of_book',
                     'deadline_conf',
                     'date_of_conf']
     readonly_fields = ('deadline_conf', 'status_conf', 'date_of_conf')
+    ordering = ('checkin',)
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
@@ -29,7 +32,9 @@ class RoomAdmin(admin.ModelAdmin):
                     'price',
                     'capacity',
                     'beds',
+                    'size',
                     'text']
+    readonly_fields = ('checkin', 'checkout',)
 
 admin.site.register(Category)
 
