@@ -1,0 +1,90 @@
+        <div id="booking">
+            <div class="container">
+                <div class="section-header">        
+                    {% if form.errors %}
+                    <h2 class="text-danger">К сожалению, Ваше бронирование не прошло проверку</h2>
+                    {% else %}
+                    <h2 style="color: #00CED1;">Все в порядке, можем бронировать!</h2>
+                    {% endif %}                          
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="booking-form">
+                            <div id="success"></div>
+                            <form name="sentMessage" id="bookingForm" novalidate="novalidate" method="POST">
+                                {% csrf_token %}
+                                <div class="form-row">
+                                    <div class="control-group col-md-4">
+                                        <label>Фамилия: </label>
+                                        <span class="text-span">{{ user.last_name }}</span>
+                                        
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                    <div class="control-group col-md-4">
+                                        <label>Имя:</label>   
+                                        <span class="text-span">{{ user.first_name }}</span>                                     
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="control-group col-md-4">
+                                        <label>Телефон: </label>                                        
+                                        <span class="text-span">{{ user.phone }}</span>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                    <div class="control-group col-md-4">
+                                        <label>Email: </label>
+                                        <span class="text-span">{{ user.email }}</span>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="control-group col-md-4">
+                                        <label>Заселение</label>
+                                        <span class="text-span">{{ form.checkin.value }}</span>     
+                                        <p class="help-block text-danger"></p>  
+                                        {% if form.errors.checkin %}
+                                            <div class="alert alert-danger" role="alert">
+                                                {{ form.errors.checkin }}
+                                            </div>
+                                        {% endif %}                                      
+                                    </div>
+
+                                    <div class="control-group col-md-4">
+                                        <label>Убытие</label>
+                                        <span class="text-span">{{ form.checkout.value }}</span>
+                                        <p class="help-block text-danger"></p>
+                                        {% if form.errors.checkout %}
+                                            <div class="alert alert-danger" role="alert">
+                                                {{ form.errors.checkout }}
+                                        </div>
+                                    {% endif %}
+                                    </div>
+                                    
+                                </div>
+                                <div class="form-row">
+                                    <div class="control-group col-sm-12">
+                                        <label>Взрослые: </label>
+                                        <span class="text-span">{{ form.adults.value }}</span>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                    <div class="control-group col-sm-12">
+                                        <label>Дети: </label>
+                                        <span class="text-span">{{ form.kids.value }}</span>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Пожелания и предпочтения</label>
+                                    <span class="text-span">{{ form.special.value }}</span>
+                                    <p class="help-block text-danger"></p>
+                                </div>                                
+                                <div class="button"><button type="submit" id="bookingButton" name='booking'>Забронировать</button></div>
+                                
+                            </form>
+                        </div>
+                    </div>
+                </div>                
+            </div>
+        </div>

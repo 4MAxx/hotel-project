@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth import get_user_model
 from django.forms import ModelForm
 from django import forms
@@ -45,3 +47,16 @@ class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
         fields = ('checkin', 'checkout', 'adults', 'kids', 'special',)
+
+    # def clean_checkin(self):
+    #     checkin = self.cleaned_data.get('checkin')
+    #     checkout = self.cleaned_data.get('checkout')
+    #
+    #     if checkin < datetime.date.today():
+    #         raise forms.ValidationError('Введите корректную дату')
+
+    # def clean_checkout(self):
+    #     checkin = self.cleaned_data.get('checkin')
+    #     checkout = self.cleaned_data.get('checkout')
+    #     if checkin >= checkout:
+    #         raise forms.ValidationError('Дата выезда не может быть равна либо позже даты заезда')

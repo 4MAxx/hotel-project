@@ -1,5 +1,6 @@
 import datetime
 
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.models import Group, AbstractUser
 from django.db import models
@@ -76,26 +77,13 @@ class Booking(models.Model):
         '''
             вызывает исключение если пересекаются даты бронирования (например, из админки)
         '''
-        db_room = Booking.objects.filter(room=self.room.pk)
-        if db_room:
-            for i in db_room:
-                if (i.checkout <= self.checkin and i.checkout < self.checkout) or \
-                    (i.checkin >= self.checkout and i.checkin > self.checkin):
-                    pass
-                else:
-                    return False
+        room = Booking.objects.filter(room=self.room.pk)
+        check = room.all().exclude(Q(checkout__lte=self.checkin, checkout__lt=self.checkout) |
+                                            Q(checkin__gte=self.checkout, checkin__gt=self.checkin))
+        # если нашлось пересечение, вернет False
+        if check: return False
 
         return True
-
-
-        # r_after = db_room.objects.filter(checkout__lte=self.checkin)
-        # if not r_after:
-        #     r_befor = db_room.objects.filter(checkin__gte=self.checkout)
-        #     if r_befor: return True
-        # if (self.checkin < db_room.checkin and self.checkout <= db_room.checkin) or \
-        #         (self.checkin >= db_room.checkout and self.checkout > db_room.checkout):
-        #     return True
-
 
     def save(self, *args, **kwargs):
         if self.deadline_conf is None:

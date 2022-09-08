@@ -394,6 +394,8 @@ var DateTimePicker = function ($, moment) {
             }
         };
 
+        
+
         DateTimePicker.prototype._update = function _update() {
             if (!this.widget) {
                 return;

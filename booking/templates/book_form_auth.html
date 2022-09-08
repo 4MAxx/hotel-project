@@ -1,18 +1,23 @@
 <!-- Booking Section Start -->
         <div id="booking">
             <div class="container">
-            	<div class="section-header">
-                    {% if room_list %}
-                    <h2>Бронирование</h2>
-                    <p>
-                        Проверьте и подтвердите данные, завершите процедуру бронирования 
-                    </p>
-                    {% else %}
-                    <h2>Воспользуйтесь поиском свободных номеров</h2>
-                    <p>
-                        Введите предполагаемые даты заселения и выезда, система подберет Вам свободные номера
-                    </p>
+            	<div class="section-header">      
+                    {% if form.errors or errors %}
+                        <h2 class="text-danger">Исправьте ошибки в бронировании</h2>                            
+                    {% else %}              
+                        {% if room_list %}
+                            <h2>Бронирование</h2>
+                            <p>
+                                Проверьте и подтвердите данные, завершите процедуру бронирования 
+                            </p>
+                        {% else %}
+                            <h2>Воспользуйтесь поиском свободных номеров</h2>
+                            <p>
+                                Введите предполагаемые даты заселения и выезда, система подберет Вам свободные номера
+                            </p>
+                        {% endif %}
                     {% endif %}
+
                 </div>
                 {% if room_list %}                
                 <div class="row">
@@ -22,77 +27,147 @@
                             <form name="sentMessage" id="bookingForm" novalidate="novalidate" method="POST">
                             	{% csrf_token %}
                                 <div class="form-row">
-                                    <div class="control-group col-sm-6">
-                                        <label>Фамилия</label>
-                                        <input type="text" class="form-control" id="lname" placeholder="Иванов" required="required" data-validation-required-message="Пожалуйста введите фамилию" name="last_name" value='{{ user.last_name }}'/>
+                                    <div class="control-group col-md-4">
+                                        <label>Фамилия: </label>
+                                        <span class="text-span">{{ user.last_name }}</span>
+                                        
                                         <p class="help-block text-danger"></p>
                                     </div>
-                                    <div class="control-group col-sm-6">
-                                        <label>Имя</label>
-                                        <input type="text" class="form-control" id="fname" placeholder="Иван" required="required" data-validation-required-message="Пожалуйста введите имя" name="first_name" value='{{ user.first_name }}'/>
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="control-group col-sm-6">
-                                        <label>Телефон</label>
-                                        <input type="text" class="form-control" id="mobile" placeholder="+375296000000" required="required" data-validation-required-message="Пожалуйста введите телефон" name="phone" value='{{ user.first_name }}'/>
-                                        <p class="help-block text-danger"></p>
-                                    </div>
-                                    <div class="control-group col-sm-6">
-                                        <label>Email</label>
-                                        <input type="email" class="form-control" id="email" placeholder="email@example.com" required="required" data-validation-required-message="Пожалуйста введите свой email" name="email" value='{{ user.email }}'/>
+                                    <div class="control-group col-md-4">
+                                        <label>Имя:</label>   
+                                        <span class="text-span">{{ user.first_name }}</span>                                     
                                         <p class="help-block text-danger"></p>
                                     </div>
                                 </div>
                                 <div class="form-row">
-                                    <div class="control-group col-sm-6">
+                                    <div class="control-group col-md-4">
+                                        <label>Телефон: </label>                                        
+                                        <span class="text-span">{{ user.phone }}</span>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                    <div class="control-group col-md-4">
+                                        <label>Email: </label>
+                                        <span class="text-span">{{ user.email }}</span>
+                                        <p class="help-block text-danger"></p>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="control-group col-sm-4">
                                         <label>Заселение</label>
-                                        <input type="text" class="form-control datetimepicker-input" id="date-1" data-toggle="datetimepicker" data-target="#date-1" placeholder="ДД/ММ/ГГГГ" required="required" data-validation-required-message="Пожалуйста введите дату заселения" name="checkin"/>
- 											                                
-
-                                        <p class="help-block text-danger"></p>
+                                        <div class="form-group">
+                                            <div class="input-group date" id="date-1" data-target-input="nearest">  
+                                                {% if data.ci %}
+                                                    <input type="text" class="form-control datetimepicker-input" id="date-1"  name="checkin" id="checkin" value="{{ data.ci }}"  data-validation-required-message="требуется дата" autocomplete="off" placeholder="ММ.ДД.ГГГГ"/>
+                                                {% elif form.checkin.value %}                                
+                                                    <input type="text" class="form-control datetimepicker-input" id="date-1"  name="checkin" id="checkin" value="{{ form.checkin.value }}"  data-validation-required-message="требуется дата" autocomplete="off" placeholder="ММ.ДД.ГГГГ"/>
+                                                {% else %}
+                                                    <input type="text" class="form-control datetimepicker-input" id="date-1"  name="checkin" id="checkin"   data-validation-required-message="требуется дата" autocomplete="off" placeholder="ММ.ДД.ГГГГ"/>
+                                                {% endif %}
+                                                <div class="input-group-append" data-target="#date-1" data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                </div>
+                                                
+                                            </div>
+                                            <p class="help-block text-danger"></p>
+                                        </div>           
+                                        {% if form.errors.checkin %}
+                                            <div class="alert alert-danger" role="alert">
+                                                {{ form.errors.checkin }}
+                                            </div>
+                                        {% endif %}  
+                                         
+                                        
                                     </div>
-                                    <div class="control-group col-sm-6">
+                                    <div class="control-group col-sm-4">
                                         <label>Убытие</label>
-                                        <input type="text" class="form-control datetimepicker-input" id="date-2" data-toggle="datetimepicker" data-target="#date-2" placeholder="ДД/ММ/ГГГГ" required="required" data-validation-required-message="Пожалуйста введите дату убытия" name="checkout" />
-                                        <p class="help-block text-danger"></p>
+                                        <div class="form-group">
+                                            <div class="input-group date" id="date-2" data-target-input="nearest">  
+                                                {% if data.co %} 
+                                                    <input type="text" class="form-control datetimepicker-input" id="date-2"  name="checkout" id="checkout" value="{{ data.co }}"  data-validation-required-message="требуется дата" autocomplete="off" placeholder="ММ.ДД.ГГГГ"/>
+                                                {% elif form.checkout.value %}                             
+                                                    <input type="text" class="form-control datetimepicker-input" id="date-2"  name="checkout" id="checkout" value="{{ form.checkout.value }}"  data-validation-required-message="требуется дата" autocomplete="off" placeholder="ММ.ДД.ГГГГ"/>
+                                                {% else %}
+                                                    <input type="text" class="form-control datetimepicker-input" id="date-2"  name="checkout" id="checkout" data-validation-required-message="требуется дата" autocomplete="off" placeholder="ММ.ДД.ГГГГ"/>
+                                                {% endif %}
+                                                <div class="input-group-append" data-target="#date-2" data-toggle="datetimepicker">
+                                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                                </div>
+                                            </div>
+                                            <p class="help-block text-danger"></p>
+                                        </div>           
+                                        {% if form.errors.checkout %}
+                                            <div class="alert alert-danger" role="alert">
+                                                {{ form.errors.checkout }}
+                                            </div>
+                                        {% endif %}                
                                     </div>
+                                    {% if errors.book %}
+                                        <div class="alert alert-danger" role="alert">
+                                            На данные даты номер занят, выберите другие даты или воспользуйтесь<a href="{% url 'rooms' %}" style="text-decoration: underline;"> поиском номеров</a>
+                                        </div>
+                                    {% endif %}
                                 </div>
                                 <div class="form-row">
-                                    <div class="control-group col-sm-6">
+                                    <div class="control-group col-sm-4">
                                         <label>Взрослые</label>
                                         <select class="custom-select" id="adult" required="required" data-validation-required-message="хотя бы 1" name="adults"/>
 	                                        {% if data.ad %}
 	                                        	<option selected>{{ data.ad }}</option>
+                                            {% elif form.adults.value %}
+                                                <option selected>{{ form.adults.value }}</option>
 	                                    	{% else %}
-	                                        	<option selected></option>
+	                                        	<option selected>1</option>
 	                                    	{% endif %}
                                             <option value="1">1</option>
                                             <option value="2">2</option>                                            
                                         </select>
                                         <p class="help-block text-danger"></p>
+                                        {% if form.errors.adults %}
+                                            <div class="alert alert-danger" role="alert">
+                                                {{ form.errors.adults }}
+                                            </div>
+                                        {% endif %}                
                                     </div>
-                                    <div class="control-group col-sm-6">
+                                    <div class="control-group col-sm-4">
                                         <label>Дети</label>
                                         <select class="custom-select" id="kid" required="required" data-validation-required-message="Please select one" name="kids"/>
                                             {% if data.ad %}
 		                                        <option selected>{{ data.kid }}</option>
+                                            {% elif form.kids.value %}
+                                                <option selected>{{ form.kids.value }}</option>
 		                                    {% else %}
 		                                        <option selected>0</option>
 		                                    {% endif %}
-                                            <option value="1">1</option>
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>  
                                             <option value="2">2</option>                                            
                                         </select>
                                         <p class="help-block text-danger"></p>
+                                        {% if form.errors.kids %}
+                                            <div class="alert alert-danger" role="alert">
+                                                {{ form.errors.kids }}
+                                            </div>
+                                        {% endif %}                
                                     </div>
+                                    {% if errors.capacity %}
+                                    <div class="alert alert-danger" role="alert">
+                                        Вместимость выбранного номера меньше запрашиваемой</a>
+                                    </div>
+                                    {% endif %}
                                 </div>
                                 <div class="control-group">
                                     <label>Пожелания и предпочтения</label>
-                                    <input type="text" class="form-control" id="request" placeholder="Введите особые пожелания" required="required" data-validation-required-message="Введите особые пожелания" name="special"/>
+                                    <input type="text" class="form-control" id="request" placeholder="Введите особые пожелания" required="required" data-validation-required-message="Введите особые пожелания" name="special" value="{{ form.special.value }}"/>
                                     <p class="help-block text-danger"></p>
                                 </div>
+                                {% if errors %}
+                                    
+                                {% else %}                                
+                                <label class="text-info">Перед тем как принять Ваше бронирование мы проверяем данные на текующую минуту.<br> Таким образом мы убедимся, что Вас никто не опередил и всё в порядке</label>
+                                {% endif %}
+                                
                                 <div class="button"><button type="submit" id="bookingButton" name='booking'>Забронировать</button></div>
+                                
                             </form>
                         </div>
                     </div>

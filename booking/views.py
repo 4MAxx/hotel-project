@@ -23,6 +23,7 @@ class SearchFormData():
     ad = 0
     kid = 0
     result = False
+    id = None
 
     @staticmethod
     def reset():
@@ -44,14 +45,18 @@ def searching_results(request):
     SearchFormData.ad = request.POST['adults']
     SearchFormData.kid = request.POST['kids']
     if SearchFormData.ci and SearchFormData.co and SearchFormData.ad:
+        try:
+            checkin = datetime.strptime(SearchFormData.ci, '%d.%m.%Y').date()
+            checkout = datetime.strptime(SearchFormData.co, '%d.%m.%Y').date()
+            capacity = int(SearchFormData.ad) + int(SearchFormData.kid)
+        except:
+            SearchFormData.reset()
+            return None
         SearchFormData.result = True
-        checkin = datetime.strptime(SearchFormData.ci, '%d.%m.%Y').date()
-        checkout = datetime.strptime(SearchFormData.co, '%d.%m.%Y').date()
-        capacity = int(SearchFormData.ad) + int(SearchFormData.kid)
         '''
         запросы в БД для вычисления списка номеров (поиск свободных номеров с учетом базы бронирований)
         '''
-        # фильтруем номера (ищем которые нельзя)
+        # фильтруем номера (ищем которые можно - (обратное от нельзя))
         books_ex = Booking.objects.exclude(Q(checkout__lte=checkin, checkout__lt=checkout) |
                                         Q(checkin__gte=checkout, checkin__gt=checkin))
         # фильтруем номера по признаку вместимости
@@ -59,7 +64,7 @@ def searching_results(request):
 
         return rooms
     else:
-        # эта ветка на тот случай если форма поиска не валидируется браузером
+        # эта ветка на тот случай если форма поиска не валидируется браузером ()
         SearchFormData.reset()
         return None
 
@@ -98,28 +103,50 @@ def booking(request):
         context = {'room_list': searching_results(request), 'search': True, 'data': SearchFormData}
         return render(request, 'room_list.html', context)
 
-    return render(request, 'booking.html', {'search': True})
+    return render(request, 'booking.html', {'search': True, 'data': SearchFormData})
 
 
 def create_book(request, pk):
     '''
         страница "Бронирование номера"
     '''
+    room_list = [Room.objects.get(pk=pk)]
+    errors = {}
+
+    def check_book(booking):
+        room = Booking.objects.filter(room=booking.room.pk)
+        check = room.all().exclude(Q(checkout__lte=booking.checkin, checkout__lt=booking.checkout) |
+                                    Q(checkin__gte=booking.checkout, checkin__gt=booking.checkin))
+        # если нашлось пересечение, значит запишет ошибку
+        if check:
+            errors['book'] = True
+        # если вместимость номера меньше запрашиваемой, значит запишет ошибку
+        if booking.kids + booking.adults > booking.room.capacity:
+            errors['capacity'] = True
+        # если бронирование прошло проверку и нет ошибок то False иначе вернет словарь с ошибками
+        return False if not errors else errors
+
     if request.method == 'POST' and 'search' in request.POST:
         context = {'room_list': searching_results(request), 'search': True, 'data': SearchFormData}
         return render(request, 'room_list.html', context)
+
     elif request.method == 'POST' and 'booking' in request.POST:
         form = BookingForm(request.POST)
         if form.is_valid():
             booking = form.save(commit=False)
             booking.user = request.user
             booking.room = Room.objects.get(pk=pk)
-            booking.save()
-            return redirect('success')
-        else: return redirect('fail')
+            errors = check_book(booking)
+            if errors == False:
+                booking.save()
+                return redirect('success')
 
-    room_list = [Room.objects.get(pk=pk)]
-    return render(request, 'booking.html', {'room_list': room_list, 'search': True, 'data':SearchFormData})
+        context = {'room_list': room_list, 'search': False, 'form':form, 'errors': errors}
+        return render(request, 'booking.html', context)
+        # return redirect('fail')
+
+    context = {'room_list': room_list, 'search': True, 'data':SearchFormData}
+    return render(request, 'booking.html', context)
 
 def success(request):
     return render(request, 'success.html')

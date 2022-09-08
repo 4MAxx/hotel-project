@@ -3,14 +3,28 @@
 {% block title %}Гостишка | Бронирование{% endblock %}
 
 {% block content %}
-        {% if room_list %}
-            {% include "book_room.html" %}
-        {% endif %}
-        <!-- Booking Section Start -->
-        {% if user.is_authenticated %}
-            {% include "book_form_auth.html" %}
+        {% if form.errors or errors %}
+
+            <!-- Booking Section Start -->            
+            {% include "book_form_auth.html" %} 
+            <!-- Booking Section End -->          
+
+            {% include "book_room.html" %}         
+
         {% else %}
-            {% include "book_form.html" %}
+
+            {% if room_list %}
+                {% include "book_room.html" %}
+            {% endif %}
+
+            <!-- Booking Section Start -->
+            {% if user.is_authenticated %}
+                {% include "book_form_auth.html" %}
+            {% else %}
+                {% include "book_form.html" %}
+            {% endif %}
+            <!-- Booking Section End -->
+
         {% endif %}
-        <!-- Booking Section End -->
+
 {% endblock %}
