@@ -45,7 +45,7 @@ class Room(models.Model):
     slide3 = models.ImageField(upload_to='booking/img/room-slide', blank=True, null=True, verbose_name = 'Слайд 3')
 
     def __str__(self):
-        return f'{str(self.number)} - {self.category}'
+        return f'{self.category} ={str(self.number)}='
 
 
 class Booking(models.Model):
@@ -78,7 +78,7 @@ class Booking(models.Model):
     date_of_depart = models.DateField(blank=True, null=True, verbose_name='Дата выезда')
 
     def __str__(self):
-        return f'№: {self.room} - Статус: {self.get_status_conf_display()}'
+        return f'№: {self.id} | {self.room} | Статус: {self.get_status_conf_display()}'
 
     def check_dates(self):
         '''
