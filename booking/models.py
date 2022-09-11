@@ -52,8 +52,8 @@ class Booking(models.Model):
         verbose_name_plural = 'Бронирования'
         ordering = ['checkin', 'status_conf']
 
-    STATUSES = [('2', 'wait'),
-                ('1', 'confirm'),
+    STATUSES = [('1', 'confirm'),
+                ('2', 'wait'),
                 ('3', 'cancel'),
                 ('4', 'expire'),
                 ('5', 'success')]
@@ -69,6 +69,9 @@ class Booking(models.Model):
     status_conf = models.CharField(max_length=1, choices=STATUSES, default='2', verbose_name = 'Статус брони')
     deadline_conf = models.DateField(blank=True, null=True, verbose_name = 'Срок оплаты')
     date_of_conf = models.DateField(blank=True, null=True, verbose_name = 'Дата оплаты')
+    date_of_cancel = models.DateField(blank=True, null=True, verbose_name='Дата отмены')
+    nights = models.IntegerField(default=1, verbose_name='Ночей')
+    cost = models.IntegerField(default=0, verbose_name='Общая стоимость')
 
     def __str__(self):
         return f'№: {self.room} - Статус: {self.get_status_conf_display()}'
@@ -77,7 +80,7 @@ class Booking(models.Model):
         '''
             вызывает исключение если пересекаются даты бронирования (например, из админки)
         '''
-        room = Booking.objects.filter(room=self.room.pk)
+        room = Booking.objects.filter(room=self.room.pk, status_conf__in=['1','2'])
         check = room.all().exclude(Q(checkout__lte=self.checkin, checkout__lt=self.checkout) |
                                             Q(checkin__gte=self.checkout, checkin__gt=self.checkin))
         # если нашлось пересечение, вернет False
@@ -89,10 +92,8 @@ class Booking(models.Model):
         if self.deadline_conf is None:
             self.deadline_conf = datetime.datetime.now().date() + datetime.timedelta(days=1)
         if self.check_dates() == False:
-            raise ValueError('Допущено пересечение дат по бронированию')
+            raise ValueError('Допущено пересечение дат по бронированию, выберите другой промежуток дат')
         super(Booking, self).save(*args, **kwargs)
-
-
 
 
 class CustomUser(AbstractUser):
@@ -108,7 +109,11 @@ class CustomUser(AbstractUser):
     is_vip = models.BooleanField(default=False, verbose_name = 'VIP')
     phone = models.CharField(max_length=20,blank=True, null=True, verbose_name = 'Телефон')
     gender = models.CharField(max_length=1, choices=GENDERS, default='', verbose_name = 'Пол')
-    # adress = models.CharField(max_length=200, blank=True, null=True, verbose_name = 'Адрес проживания')
+    img = models.ImageField(upload_to='booking/img/avatar', blank=True, null=True, verbose_name='Аватарка')
+    adress = models.CharField(max_length=200, blank=True, null=True, verbose_name = 'Адрес проживания')
+    doc1 = models.ImageField(upload_to='booking/img/docs', blank=True, null=True, verbose_name='Фото документа 1')
+    doc2 = models.ImageField(upload_to='booking/img/docs', blank=True, null=True, verbose_name='Фото документа 2')
+    doc3 = models.ImageField(upload_to='booking/img/docs', blank=True, null=True, verbose_name='Фото документа 3')
 
     def __str__(self):
         if self.first_name and self.last_name:

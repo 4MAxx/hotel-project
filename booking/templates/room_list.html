@@ -46,7 +46,12 @@
                             <div class="col-md-6">
                                 <div class="room-des">
                                     <h3>{{room.number}}-{{ room.category }}</h3>
+                                    {% if data.result == True %}
+                                    <h2 class="text-success">{{ data.nights }} ночей - {% widthratio data.nights 1 room.price %}$</h2>
+                                    <h3>${{ room.price }}<span>/ Ночь</span></h3>
+                                    {% else %}
                                     <h1>${{ room.price }}<span>/ Ночь</span></h1>
+                                    {% endif %}
                                     <ul class="room-size">
                                         <li><i class="fa fa-arrow-right"></i>Размер: {{ room.size }} м2 </li>
                                         <li><i class="fa fa-arrow-right"></i>Кроватей: {{ room.beds }} раздельных </li>

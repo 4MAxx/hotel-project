@@ -1,0 +1,374 @@
+<!--
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+---- Include the above in your HEAD tag ---------->
+{% extends 'base_other.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<div class="container ">
+    <div id="rooms">
+      <div class="container">
+      
+    		<div class="section-header">
+            <h2>Добро пожаловать, {{ user.first_name }} !</h2>
+            
+            <p>в этом разделе вся актуальная информация о вашем профиле</p>
+        </div>  	
+      </div>
+    </div>
+    <div id="profile">
+      <div class="row ">
+        <div class="col-md-12 info">
+          <div class="row ">
+            <div class="col-sm-3 ">
+                <div class="info-avatar text-center">
+                  {% if user.img %}
+                    <img class="" title="Аватар" class="img-circle img-responsive" src="{{ user.img.url }}">
+                  {% else %}
+                    <img class="" title="Аватар" class="img-circle img-responsive" src="{% static 'img/avatar/noavatar.png' %}">
+                  {% endif %}
+                </div>
+                <div class="info-button text-center">
+                  
+                    <button type="submit" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#change_avatar" data-uid="2">Загрузить фото</button>
+                    
+                  
+                </div>        
+            </div>
+        		<div class="col-sm-6"><!--left col-->              
+                <ul class="list-group">
+                  {% if user.is_vip == False %}
+                  <li class="list-group-item text-muted text-right"><span class="pull-left">Профиль</span><strong >Гость</strong></li>
+                  {% else %}
+                  <li class="list-group-item text-muted text-right"><span class="pull-left">Профиль</span><strong class="text-danger">VIP-Гость</strong></li>
+                  {% endif %}
+                  <li class="list-group-item text-right"><span class="pull-left"><strong>Полное имя</strong></span> {{ user.first_name }} {{ user.last_name }}</li>
+                  <li class="list-group-item text-right"><span class="pull-left"><strong>Email</strong></span> {{ user.email }}</li>
+                  <li class="list-group-item text-right"><span class="pull-left"><strong>Телефон</strong></span> {{ user.phone }}</li>
+                  <li class="list-group-item text-right"><span class="pull-left"><strong>Дата регистрации</strong></span> {{ user.date_joined }}</li>                 
+                </ul>             
+            </div><!--/col-9-->
+          </div>
+        </div>
+
+        <div id="change_avatar" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal">×</button>
+                          <h4 class="modal-title">Загрузка фото</h4>
+                        </div>
+                        <div class="modal-body">
+                          {{ form.as_p }}
+                        </div>
+                        <div class="modal-footer">  
+                          <button type="submit" id="up" class="btn btn-success" name="change_avatar">Загрузить</button>
+                          <button type="button" class="btn btn-danger" data-dismiss="modal">Отмена</button>
+                        
+                        </div>
+                      </form>  
+                    </div>
+                  </div>
+                </div>
+        
+        
+    	  <div class="col-md-12 info">
+          <div class="row ">
+            <ul class="nav nav-tabs" id="myTab">
+              <li class="nav-item "><a class="nav-link active" href="#home" data-toggle="tab">Актуальное бронирование</a></li>
+              <li class="nav-item"><a class="nav-link" href="#history" data-toggle="tab">История бронирований</a></li>
+              <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Настройки</a></li>
+            </ul>
+              
+            <div class="tab-content col-md-12">
+              <!-- закладка -->
+              <div class="tab-pane active" id="home">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>№</th>
+                        <th>Статус</th>
+                        <th>Действие</th>
+                        <th>Срок оплаты</th>
+                        <th>Номер</th>
+                        <th>Стоимость</th>
+                        <th>Заселение</th>
+                        <th>Убытие</th>
+                        <th>Ночей</th>
+                        <th>Пожелания</th>
+                      </tr>
+                    </thead>
+                    {% for book in actual %}
+                    <tbody id="items">
+                      <tr >
+                        <td>{{ book.id }}</td>
+                        {% if book.status_conf == '1' %}
+                          <td class="btn btn-success"><strong>{{ book.get_status_conf_display }}</strong></td>
+                        {% else %}
+                          <td class="btn btn-warning"><strong>{{ book.get_status_conf_display }}</strong></td>
+                        {% endif %}
+                        <td>
+                          {% if book.status_conf == '1' %}
+                          <button type="button" data-toggle="modal" data-target="#edit{{ forloop.counter }}" data-uid="1" class="update btn btn-outline-dark">Отменить</button>
+                          {% else %}
+                          <button type="button" data-toggle="modal" data-target="#edit{{ forloop.counter }}" data-uid="1" class="update btn btn-info">Оплатить</button>
+                          {% endif %}
+                        </td>
+                        <td>{{ book.deadline_conf|date:"d.m.Y" }}</td>
+                        <td data-toggle="collapse" data-target="#demo{{ forloop.counter }}" class="accordion-toggle "><button class="btn btn-sm">
+                          <i class="bi bi-eye">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                              <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                            </svg>
+                          </i></button> {{ book.room }}
+                        </td>
+                        <td><b>{{ book.cost }} $</b></td>
+                        <td>{{ book.checkin|date:"d.m.Y" }}</td>
+                        <td>{{ book.checkout|date:"d.m.Y" }}</td>
+                        <td>{{ book.nights }}</td>
+                        <td>{{ book.special }}</td>
+                      </tr>
+                    
+                      <tr>
+                        <td colspan="12" class="hiddenRow"><div class="accordian-body collapse" id="demo{{ forloop.counter }}"> 
+                          <table class="table table-striped">
+                              <h3>Информация о номере {{ book.room }}</h3>
+                                <tbody>
+                                  <div id="rooms">
+                                    <div class="container">
+                            					<div class="col-md-12 room">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="room-img">
+                                                    <img src="{{ book.room.img.url }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="room-des">
+                                                    
+                                                    <h1>${{ book.room.price }}<span>/ Ночь</span></h1>
+                                                    <ul class="room-size">
+                                                        <li><i class="fa fa-arrow-right"></i>Размер: {{ book.room.size }} м2 </li>
+                                                        <li><i class="fa fa-arrow-right"></i>Кроватей: {{ book.room.beds }} раздельных </li>
+                                                    </ul>
+                                                    <ul class="room-icon">
+                                                        <li class="icon-1"></li>
+                                                        <li class="icon-2"></li>
+                                                        <li class="icon-3"></li>
+                                                        <li class="icon-4"></li>
+                                                        <li class="icon-5"></li>
+                                                        <li class="icon-6"></li>
+                                                        <li class="icon-7"></li>
+                                                        <li class="icon-8"></li>
+                                                        <li class="icon-9"></li>
+                                                        <li class="icon-10"></li>
+                                                    </ul>
+                                                    <div class="room-link">
+                                                        <a href="#" data-toggle="modal" data-target="#modal-id{{ forloop.counter }}">Подробнее</a>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div id="modal-id{{ forloop.counter }}" class="modal fade" tabindex="-1" role="dialog">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="port-slider">
+                                                            <div><img src="{{ book.room.slide1.url }}"></div>
+                                                            <div><img src="{{ book.room.slide2.url }}"></div>
+                                                            <div><img src="{{ book.room.slide3.url }}"></div>
+
+                                                        </div>
+                                                        <div class="port-slider-nav">
+                                                            <div><img src="{{ book.room.slide1.url }}"></div>
+                                                            <div><img src="{{ book.room.slide2.url }}"></div>
+                                                            <div><img src="{{ book.room.slide3.url }}"></div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <h2>{{ book.room.category }}</h2>
+                                                        <p>
+                                                            {{ book.room.text }}
+                                                        </p>                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+              				        </tbody>
+  				
+                          </table>
+                          <a id="add_row" class="btn btn-default pull-left">кнопка</a>
+                          <a id='delete_row' class="pull-right btn btn-default">кнопка</a>
+                
+                            </div>
+                        </td>
+                      </tr>   
+                    </tbody>
+                    {% endfor %}
+                    
+                  </table>
+
+                 <hr>
+                 
+                  <div class="row">
+                    <div class="col-md-6 col-md-offset-4 text-center">
+                    	<ul class="pagination" id="myPager"></ul>
+                    </div>
+                  </div>
+
+                </div><!--/table-resp-->
+                
+                {% for book in actual %}
+                <div id="edit{{ forloop.counter }}" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title">Действия с бронированием</h4>
+                      </div>
+                      <div class="modal-body">
+                        <ul class="list-group">               
+                          <li class="list-group-item text-left"><strong>Номер: {{ book.room }} </strong></li>
+                          <li class="list-group-item text-left"><strong>Заселение: {{ book.checkin }} </strong></li>
+                          <li class="list-group-item text-left"><strong>Убытие: {{ book.checkout }} </strong></li>
+                          <li class="list-group-item text-left"><strong>Ночей: {{ book.nights }} </strong></li>   
+                          <li class="list-group-item text-left"><strong>Стоимость: {{ book.cost }} </strong></li>              
+                        </ul>         
+                      </div>
+                      <div class="modal-footer">
+                        {% if book.status_conf == '1' %}
+                        {% else %}
+                        <a href="{% url 'confirm_book' pk=book.id %}">
+                          <button type="button" id="up" class="btn btn-success" name="confirm_book">Оплатить</button>
+                        </a> 
+                        {% endif %}                       
+                        <a href="{% url 'cancel_book' pk=book.id %}">
+                          <button type="button" id="up" class="btn btn-warning" name="cancel_book">Отменить бронирование</button>
+                        </a>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Отмена</button>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+
+                <hr>                
+              </div>
+              <!-- 1 -->
+              
+              <!-- Закладка 2 -->
+              <div class="tab-pane" id="history">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>№</th>
+                        <th>Статус</th>
+                        <th>Дата</th>
+                        <th>Номер</th>
+                        <th>Стоимость</th>
+                        <th>Заселение</th>
+                        <th>Убытие</th>
+                        <th>Ночей</th>
+                        <th>Пожелания</th>
+                      </tr>
+                    </thead>
+                    {% for book in history %}
+                    <tbody id="items">
+                      {% if book.status_conf == '1' %}
+                      <tr class="table-success">
+                      {% elif book.status_conf == '2' %}
+                      <tr class="table-warning">
+                      {% elif book.status_conf == '3' %}
+                      <tr class="table-danger">
+                      {% elif book.status_conf == '4' %}
+                      <tr class="table-secondary">
+                      {% endif %}
+                        <td>{{ book.id }}</td>
+                        <td>{{ book.get_status_conf_display }}</td>
+                        <td>{{ book.date_of_book|date:"d.m.Y" }}</td>
+                        <td>{{ book.room }}</td>
+                        <td>{{ book.cost }}</td>
+                        <td>{{ book.checkin|date:"d.m.Y" }}</td>
+                        <td>{{ book.checkout|date:"d.m.Y" }}</td>
+                        <td>{{ book.nights }}</td>
+                        <td>{{ book.special }}</td>
+                      </tr>
+                    </tbody>
+                    {% endfor %}
+                    
+                  </table>
+
+                 <hr>
+                 
+                  <div class="row">
+                    <div class="col-md-6 col-md-offset-4 text-center">
+                      <ul class="pagination" id="myPager"></ul>
+                    </div>
+                  </div>
+
+                </div><!--/table-resp-->
+
+                <hr>                
+              </div>
+              <!-- 2 -->
+              
+              <!-- Закладка 3 -->
+              <div class="tab-pane" id="settings">
+                  <hr>
+                  <div class="col-md-4">
+                    <form>
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="first_name"><h4>Введите пароль</h4></label>
+                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="nome" title="Inserisci il nome">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                              <label for="last_name"><h4>Подтвердите пароль</h4></label>
+                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Cognome" title="Inserisci il cognome">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                             <div class="col-xs-12">
+                                  <br>
+                                  <button class="btn btn-lg btn-success" type="submit"><i class="glyphicon glyphicon-ok-sign"></i> Сохранить</button>
+                              </div>
+                        </div>
+                    </form>
+                  </div>
+              </div>
+              <!-- 3 -->
+            </div><!--/tab-content-->
+            <hr >
+          </div><!--row-->
+        </div>
+
+      </div><!--row-->
+
+    </div><!--profile-->
+</div><!--conteiner-->
+
+{% endblock %}

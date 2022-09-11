@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 from django.shortcuts import render, redirect
 
 # Create your views here.
-from booking.forms import SearchForm, CustomUserCreationForm, BookingForm
+from booking.forms import SearchForm, CustomUserCreationForm, BookingForm, UploadAvatar
 from booking.models import Room, CustomUser, Booking
 
 '''
@@ -22,6 +22,7 @@ class SearchFormData():
     co = ''
     ad = 0
     kid = 0
+    nights = 1
     result = False
     id = None
 
@@ -31,7 +32,9 @@ class SearchFormData():
         SearchFormData.co = ''
         SearchFormData.ad = 0
         SearchFormData.kid = 0
+        SearchFormData.nights = 1
         SearchFormData.result = False
+
 
 # обработчик формы поиска свободных номеров
 def searching_results(request):
@@ -44,10 +47,17 @@ def searching_results(request):
     SearchFormData.co = request.POST['checkout']
     SearchFormData.ad = request.POST['adults']
     SearchFormData.kid = request.POST['kids']
+
     if SearchFormData.ci and SearchFormData.co and SearchFormData.ad:
         try:
             checkin = datetime.strptime(SearchFormData.ci, '%d.%m.%Y').date()
             checkout = datetime.strptime(SearchFormData.co, '%d.%m.%Y').date()
+            if checkin < checkout:
+                SearchFormData.nights = (checkout - checkin).days
+            else:
+                SearchFormData.result = True
+                return []
+
             capacity = int(SearchFormData.ad) + int(SearchFormData.kid)
         except:
             SearchFormData.reset()
@@ -56,13 +66,17 @@ def searching_results(request):
         '''
         запросы в БД для вычисления списка номеров (поиск свободных номеров с учетом базы бронирований)
         '''
-        # фильтруем номера (ищем которые можно - (обратное от нельзя))
-        books_ex = Booking.objects.exclude(Q(checkout__lte=checkin, checkout__lt=checkout) |
-                                        Q(checkin__gte=checkout, checkin__gt=checkin))
-        # фильтруем номера по признаку вместимости
-        rooms = Room.objects.exclude(id__in=books_ex.all().values('room_id')).filter(capacity__gte=capacity)
 
-        return rooms
+        # фильтруем номера (ищем которые нельзя)
+        books_ex = Booking.objects.exclude(
+            Q(checkout__lte=checkin, checkout__lt=checkout) | Q(checkin__gte=checkout, checkin__gt=checkin))
+        # оставляем только подтвержденные или в стадии подтверждения
+        books_ex2 =books_ex.filter(status_conf__in=['1','2'])
+
+        # фильтруем номера по признаку вместимости (исключаем з всех что можно - все что нельзя books_ex2)
+        rooms = Room.objects.exclude(id__in=books_ex2.all().values('room_id')).filter(capacity__gte=capacity)
+
+        return rooms.order_by('price')
     else:
         # эта ветка на тот случай если форма поиска не валидируется браузером ()
         SearchFormData.reset()
@@ -114,7 +128,9 @@ def create_book(request, pk):
     errors = {}
 
     def check_book(booking):
-        room = Booking.objects.filter(room=booking.room.pk)
+        # выбираем из Бронирований все, что касаются этого номера (только подтвержденные или в стадии подтверждения)
+        room = Booking.objects.filter(room=booking.room.pk, status_conf__in=['1','2'])
+        # ищем пересечения по датам
         check = room.all().exclude(Q(checkout__lte=booking.checkin, checkout__lt=booking.checkout) |
                                     Q(checkin__gte=booking.checkout, checkin__gt=booking.checkin))
         # если нашлось пересечение, значит запишет ошибку
@@ -123,6 +139,8 @@ def create_book(request, pk):
         # если вместимость номера меньше запрашиваемой, значит запишет ошибку
         if booking.kids + booking.adults > booking.room.capacity:
             errors['capacity'] = True
+        if booking.checkin >= booking.checkout:
+            errors['date'] = True
         # если бронирование прошло проверку и нет ошибок то False иначе вернет словарь с ошибками
         return False if not errors else errors
 
@@ -136,6 +154,7 @@ def create_book(request, pk):
             booking = form.save(commit=False)
             booking.user = request.user
             booking.room = Room.objects.get(pk=pk)
+            booking.cost = (booking.checkout - booking.checkin).days * booking.room.price
             errors = check_book(booking)
             if errors == False:
                 booking.save()
@@ -148,11 +167,14 @@ def create_book(request, pk):
     context = {'room_list': room_list, 'search': True, 'data':SearchFormData}
     return render(request, 'booking.html', context)
 
+
 def success(request):
     return render(request, 'success.html')
 
+
 def fail(request):
     return render(request, 'fail.html')
+
 
 def aboutus(request):
     '''
@@ -175,6 +197,16 @@ def contact(request):
     return render(request, 'contact.html', {'search': False})
 
 
+def booking_expired_tracing():
+    # пометили просроченные брони - expire
+    try:
+        books_ref = Booking.objects.filter(status_conf='2', deadline_conf__lt=datetime.today().date()).update(status_conf='4')
+    except:
+        pass
+    # законфирмили все брони предыдущие текущей дате (в тестовых целях)
+    # books_past = Booking.objects.filter(checkout__lt=datetime.today().date()).update(status_conf='1')
+
+
 def mylogin(request):
     '''
         страница "Логин"
@@ -185,6 +217,10 @@ def mylogin(request):
         user = authenticate(request, username=email, password=password)
         if user is not None:
             login(request, user)
+            # обновляем БД помечаем все просроченные брони
+            if str(Group.objects.get(user=user.id)) == 'Администратор':
+                booking_expired_tracing()
+
             return redirect('profile', user.pk)
         else: return render(request, 'login.html', {'access': 'denided'})
     return render(request, 'login.html', {'search': False, 'mode':'login'})
@@ -222,4 +258,39 @@ def profile(request, pk):
     '''
         страница "Профиль гостя"
     '''
-    return render(request, 'profile.html', {'search': False, 'access': 'success'})
+    form = UploadAvatar()
+    if request.method == 'POST' and 'change_avatar' in request.POST:
+        form = UploadAvatar(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.save()
+            print(user)
+
+    user_book = Booking.objects.filter(user=pk).order_by('-checkin')
+    actual_book = user_book.filter(checkout__gt=datetime.today().date(), status_conf__in=['1','2'])
+    context = {'search': False, 'access': 'success', 'actual':actual_book, 'history':user_book, 'form':form}
+    return render(request, 'profile_data.html', context)
+
+
+@login_required
+def confirm_book(request, pk):
+    '''
+        действие "подтверждение брони"
+    '''
+
+    book = Booking.objects.filter(pk=pk).update(status_conf='1', date_of_conf=datetime.today().date())
+
+    user = request.user
+    return redirect('profile', user.pk)
+
+
+@login_required
+def cancel_book(request, pk):
+    '''
+        действие "отмена брони"
+    '''
+
+    book = Booking.objects.filter(pk=pk).update(status_conf='3', date_of_cancel=datetime.today().date())
+
+    user = request.user
+    return redirect('profile', user.pk)

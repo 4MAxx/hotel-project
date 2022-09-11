@@ -485,6 +485,7 @@ h6 {
     }
 }
 
+
 /* ================================================= */
 /* ----------------- Amenities Style --------------- */
 /* ================================================= */
@@ -691,6 +692,35 @@ h6 {
 }
 
 /* ================================================= */
+/* -------------- Section Profile ------------- */
+/* ================================================= */
+#profile {
+    position: relative;
+}
+#profile .info {
+    margin-bottom: 30px;
+}
+#profile .info-avatar img {
+    margin-bottom: 30px;
+    overflow: hidden;
+    max-width: 100%;
+    height: auto;
+    max-height:100%
+}
+#profile .info-button button{
+    
+
+}
+.tab-contentOverride {
+  width: 100%;
+  max-width: 100%;
+}
+.section-profile {    
+    
+    margin: 0 0 45px;
+    padding: 0 0 15px;
+}
+/* ================================================= */
 /* ------------------ Rooms Style ------------------ */
 /* ================================================= */
 
@@ -749,7 +779,7 @@ h6 {
     margin-bottom: 15px;
 }
 
-#rooms .room-des h1 span {
+#rooms .room-des h1  span, h3 span {
     margin-left: 5px;
     font-size: 14px;
     font-weight: 400;

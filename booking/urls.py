@@ -1,7 +1,8 @@
 
 from django.urls import path
 
-from booking.views import home, booking, aboutus, amenities, contact, mylogin, room_list, registr
+from booking.views import home, booking, aboutus, amenities, contact, mylogin, room_list, registr, confirm_book, \
+    cancel_book
 from booking.views import mylogout, profile, create_book, success, fail
 
 urlpatterns = [
@@ -9,6 +10,8 @@ urlpatterns = [
     path('rooms/', room_list, name='rooms'),
     path('booking/', booking, name='booking'),
     path('booking/create/<int:pk>/', create_book, name='create_book'),
+    path('booking/confirmation/<int:pk>/', confirm_book, name='confirm_book'),
+    path('booking/cancel/<int:pk>/', cancel_book, name='cancel_book'),
     path('success/', success, name='success'),
     path('fail/', fail, name='fail'),
     path('aboutus/', aboutus, name='aboutus'),

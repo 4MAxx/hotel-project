@@ -19,7 +19,7 @@ class BookAdmin(admin.ModelAdmin):
                     'date_of_book',
                     'deadline_conf',
                     'date_of_conf']
-    readonly_fields = ('deadline_conf', 'status_conf', 'date_of_conf')
+    readonly_fields = ('deadline_conf', 'date_of_conf')
     ordering = ('checkin',)
 
 @admin.register(Room)
@@ -54,7 +54,8 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Права', {'fields': ('is_staff', 'is_active', 'groups')}),
-        ('Персональная информация', {'fields': ('last_name', 'first_name', 'phone', 'gender')})
+        ('Персональная информация', {'fields': ('last_name', 'first_name', 'phone', 'gender',
+                                                'img', 'adress', 'doc1', 'doc2', 'doc3')})
     )
     add_fieldsets = (
         (None, {

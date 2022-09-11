@@ -17,8 +17,6 @@ class SearchForm(forms.Form):
 class CustomUserCreationForm(UserCreationForm):
     password1 = forms.CharField(label='Пароль')
     password2 = forms.CharField(label='Повторите пароль')
-    # first_name = forms.CharField(label='Фамилия')
-    # last_name = forms.CharField(label='Имя')
 
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
@@ -43,10 +41,16 @@ class CustomUserChangeForm(UserChangeForm):
         model = CustomUser
         fields = ('email', 'password',)
 
+class UploadAvatar(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ('img',)
+
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
         fields = ('checkin', 'checkout', 'adults', 'kids', 'special',)
+
 
     # def clean_checkin(self):
     #     checkin = self.cleaned_data.get('checkin')
