@@ -13,7 +13,8 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-from config import my_host, my_name, my_port, my_user, my_psw
+from config import my_host, my_name, my_port, my_user, my_psw, s_key, email_use_tls, email_use_ssl, email_host, \
+    email_host_user, email_host_password, email_port
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2ft_+&=!7c5bpxn(l&6^g=l!2^fvu6+m7-=wu(8#-6trt4g$ky'
+SECRET_KEY = s_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -108,6 +109,17 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 AUTH_USER_MODEL = 'booking.CustomUser'
+
+# настойки отправки email EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_USE_TLS = email_use_tls
+EMAIL_USE_SSL = email_use_ssl
+EMAIL_HOST = email_host
+EMAIL_HOST_USER = email_host_user
+EMAIL_HOST_PASSWORD = email_host_password
+EMAIL_PORT = email_port
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

@@ -4,6 +4,8 @@ from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.models import Group, AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
@@ -57,7 +59,7 @@ class Booking(models.Model):
                 ('3', 'cancel'),
                 ('4', 'expire'),
                 ('5', 'success')]
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, null=False, blank=False,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False, blank=False,
                              verbose_name = 'Гость')
     special = models.CharField(max_length=1000, blank=True, null=True, verbose_name = 'Особые пожелания')
     date_of_book = models.DateField(auto_now_add=True, null=False, blank=False, verbose_name = 'Дата бронирования')
@@ -72,6 +74,8 @@ class Booking(models.Model):
     date_of_cancel = models.DateField(blank=True, null=True, verbose_name='Дата отмены')
     nights = models.IntegerField(default=1, verbose_name='Ночей')
     cost = models.IntegerField(default=0, verbose_name='Общая стоимость')
+    date_of_arrive = models.DateField(blank=True, null=True, verbose_name='Дата заезда')
+    date_of_depart = models.DateField(blank=True, null=True, verbose_name='Дата выезда')
 
     def __str__(self):
         return f'№: {self.room} - Статус: {self.get_status_conf_display()}'
@@ -106,6 +110,7 @@ class CustomUser(AbstractUser):
     GENDERS = (('м', 'мужской'),
                 ('ж', 'женский'),)
     email = models.EmailField(_('email address'), unique=True)
+    email_confirmed = models.BooleanField(default=False)
     is_vip = models.BooleanField(default=False, verbose_name = 'VIP')
     phone = models.CharField(max_length=20,blank=True, null=True, verbose_name = 'Телефон')
     gender = models.CharField(max_length=1, choices=GENDERS, default='', verbose_name = 'Пол')
@@ -119,3 +124,4 @@ class CustomUser(AbstractUser):
         if self.first_name and self.last_name:
             return f'{self.last_name} {self.first_name[0]}. - {self.email}'
         else: return self.email
+

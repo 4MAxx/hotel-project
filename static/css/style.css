@@ -699,10 +699,15 @@ h6 {
 }
 #profile .info {
     margin-bottom: 30px;
+    
+}
+#profile .info-avatar {
+    max-height: 300px;
+    overflow: hidden;
 }
 #profile .info-avatar img {
     margin-bottom: 30px;
-    overflow: hidden;
+    
     max-width: 100%;
     height: auto;
     max-height:100%
@@ -719,6 +724,14 @@ h6 {
     
     margin: 0 0 45px;
     padding: 0 0 15px;
+}
+#login .login-content {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 /* ================================================= */
 /* ------------------ Rooms Style ------------------ */

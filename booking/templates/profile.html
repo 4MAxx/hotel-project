@@ -6,9 +6,17 @@
             <div class="container">
                 <div class="section-header">
                     <h2>Добро пожаловать !</h2>
+                    {% if user.last_login == None %}
+                    <p class="text-success"> Ваш аккаунт успешно активирован!</p>
                     <p>
                         в этом разделе вся актуальная информация о вашем профиле
                     </p>
+                    {% else %}
+                    
+                    <p>
+                        в этом разделе вся актуальная информация о вашем профиле
+                    </p>
+                    {% endif %}
                 </div>
                 
                {% include "profile_data.html" %}

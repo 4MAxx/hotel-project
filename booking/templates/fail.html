@@ -7,14 +7,17 @@
                 <div class="section-header">
                     <h2 class="text-danger">Упс! Чтото пошло не так! </h2>
                     <p>
+                        Скорее всего "Ссылка подтверждения" просрочена либо уже была использована
+                    </p>
+                    <p>
                         Приносим свои извенения, попробуйте повторить попытку чуть позже или свяжитесь с нами удобным Вам способом
                     </p>
                     
                 </div>
                 <div class="row">
                         <div class="col-md-12">
-                            <a href="{% url 'profile' pk=user.pk %}" >
-                                <div class="button" style="text-align: center;"><button type="submit">Перейти в профиль</button></div>
+                            <a href="{% url 'login' %}" >
+                                <div class="button" style="text-align: center;"><button type="submit">Войти или зарегистрироваться</button></div>
                             </a>
                             
                           

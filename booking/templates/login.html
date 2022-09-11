@@ -15,15 +15,19 @@
                     </p>
                     {% else %}
                     <h2>Вход</h2>
+                    {% if mymess %}
+                        <p class="text-danger">{{ mymess }}</p>
+                    {% endif %}
                     <p>
                         Чтобы воспользоваться услугами на сайте требуется войти в профиль или пройти регистрацию
                     </p>
                     {% endif %}
                 </div>
-                <div class="row">
+                <div class="">
+                <div class="row login-content">
                     {% if mode == 'registr' %}
-                    <div class="col-md-6">
-                        <div class="login-form">
+                    <div class="col-md-6 ">
+                        <div class="login-form ">
                             <form method="POST">
                                 {% csrf_token %}                                
                                 <div class="form-row">                                    
@@ -97,6 +101,7 @@
                     </div>
                     
                     {% endif %}
+                </div>
                 </div>
             </div>
         </div>

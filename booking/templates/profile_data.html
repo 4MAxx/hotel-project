@@ -15,16 +15,25 @@
       
     		<div class="section-header">
             <h2>Добро пожаловать, {{ user.first_name }} !</h2>
+            {% if user.last_login %}
             
-            <p>в этом разделе вся актуальная информация о вашем профиле</p>
+            <p>
+                в этом разделе вся актуальная информация о вашем профиле
+            </p>
+            {% else %}
+            <p class="text-success"> Ваш аккаунт успешно активирован!</p>
+            <p>
+                в этом разделе вся актуальная информация о вашем профиле
+            </p>
+            {% endif %}
         </div>  	
       </div>
     </div>
     <div id="profile">
       <div class="row ">
-        <div class="col-md-12 info">
+        <div class="col-md-12 info text-center">
           <div class="row ">
-            <div class="col-sm-3 ">
+            <div class="col-lg-3 col-md-4 col-sm-4">
                 <div class="info-avatar text-center">
                   {% if user.img %}
                     <img class="" title="Аватар" class="img-circle img-responsive" src="{{ user.img.url }}">
@@ -39,7 +48,7 @@
                   
                 </div>        
             </div>
-        		<div class="col-sm-6"><!--left col-->              
+        		<div class="col-lg-6 col-md-8 col-sm-8"><!--left col-->              
                 <ul class="list-group">
                   {% if user.is_vip == False %}
                   <li class="list-group-item text-muted text-right"><span class="pull-left">Профиль</span><strong >Гость</strong></li>
@@ -342,13 +351,13 @@
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="first_name"><h4>Введите пароль</h4></label>
-                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="nome" title="Inserisci il nome">
+                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="" title="">
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-xs-6">
                               <label for="last_name"><h4>Подтвердите пароль</h4></label>
-                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Cognome" title="Inserisci il cognome">
+                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="" title="">
                             </div>
                         </div>
                         <div class="form-group">

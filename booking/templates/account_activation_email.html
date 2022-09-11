@@ -1,0 +1,7 @@
+{% autoescape off %}
+Здравствуйте!
+
+Пожалуйста, нажмите на ссылку, чтобы подтвердить адрес электронной почты и завершить регистрацию:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+{% endautoescape %}
