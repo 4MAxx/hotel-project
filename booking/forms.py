@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import CustomUser, Booking
+from .models import CustomUser, Booking, SignedForEmail
 
 
 class SearchForm(forms.Form):
@@ -51,6 +51,10 @@ class BookingForm(forms.ModelForm):
         model = Booking
         fields = ('checkin', 'checkout', 'adults', 'kids', 'special',)
 
+class SignForEmailForm(forms.ModelForm):
+    class Meta:
+        model = SignedForEmail
+        fields = ('email',)
 
     # def clean_checkin(self):
     #     checkin = self.cleaned_data.get('checkin')

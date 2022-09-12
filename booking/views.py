@@ -10,16 +10,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.shortcuts import render, redirect
 
-from django.views.generic import View
-
 # Create your views here.
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
-from booking.forms import SearchForm, CustomUserCreationForm, BookingForm, UploadAvatar
+from booking.forms import SearchForm, CustomUserCreationForm, BookingForm, UploadAvatar, SignForEmailForm
 from booking.models import Room, CustomUser, Booking
 from booking.tokens import account_activation_token
+from booking.tasks import send_email_task, send_booking_email_task, send_subj_mes_email_task
 
 '''
     Флаги контекста
@@ -98,14 +97,21 @@ def home(request):
     '''
         страница домашняя
     '''
+    form = SignForEmailForm()
     if request.method == 'POST' and 'search' in request.POST:
         context = {'room_list': searching_results(request), 'search': True, 'data':SearchFormData}
         return render(request, 'room_list.html', context)
+    elif request.method == 'POST' and 'sign_fore_email' in request.POST:
+        form = SignForEmailForm(request.POST)
+        if form.is_valid():
+            form.save()
+            send_email_task.delay(form.instance.email)
+            return redirect('signup_success')
 
     # room_list = Room.objects.order_by('price')
     room_list = Room.objects.order_by('category')[::2]
     SearchFormData.reset()
-    return render(request, 'room_list.html', {'room_list': room_list, 'main':True})
+    return render(request, 'room_list.html', {'room_list': room_list, 'main':True, 'form':form})
 
 
 def room_list(request):
@@ -155,13 +161,6 @@ def create_book(request, pk):
         # если бронирование прошло проверку и нет ошибок то False иначе вернет словарь с ошибками
         return False if not errors else errors
 
-    def send_booking_email(booking):
-        subject = 'Новое бронирование в ГОСТИШКЕ'
-        message = render_to_string('booking_email_notification.html', {'booking': booking, })
-        to_email = booking.user.email
-        email = EmailMessage(subject, message, to=[to_email])
-        email.send()
-
     if request.method == 'POST' and 'search' in request.POST:
         context = {'room_list': searching_results(request), 'search': True, 'data': SearchFormData}
         return render(request, 'room_list.html', context)
@@ -177,7 +176,7 @@ def create_book(request, pk):
             errors = check_book(booking)
             if errors == False:
                 booking.save()
-                send_booking_email(booking)
+                send_booking_email_task.delay(booking.id)
                 return redirect('success')
 
         context = {'room_list': room_list, 'search': False, 'form':form, 'errors': errors}
@@ -190,6 +189,9 @@ def create_book(request, pk):
 
 def success(request):
     return render(request, 'success.html')
+
+def signup_for_email_success(request):
+    return render(request, 'signfor_email_success.html')
 
 
 def fail(request):
@@ -220,7 +222,8 @@ def contact(request):
 def booking_expired_tracing():
     # пометили просроченные брони - expire
     try:
-        books_ref = Booking.objects.filter(status_conf='2', deadline_conf__lt=datetime.today().date()).update(status_conf='4')
+        books_ref = Booking.objects.filter(status_conf='2',
+                                           deadline_conf__lt=datetime.today().date()).update(status_conf='4')
     except:
         pass
     # законфирмили все брони предыдущие текущей дате (в тестовых целях)
@@ -238,8 +241,8 @@ def mylogin(request):
         if user is not None:
             login(request, user)
             # обновляем БД помечаем все просроченные брони
-            if str(Group.objects.get(user=user.id)) == 'Администратор':
-                booking_expired_tracing()
+            # if str(Group.objects.get(user=user.id)) == 'Администратор':
+            #     booking_expired_tracing()
 
             return redirect('profile', user.pk)
         else: return render(request, 'login.html', {'access': 'denided'})
@@ -277,8 +280,7 @@ def registr(request):
                 'token': account_activation_token.make_token(user),
             })
             to_email = form.cleaned_data.get('email')
-            email = EmailMessage(subject, message, to=[to_email])
-            email.send()
+            send_subj_mes_email_task.delay(subject, message, to_email)
 
             return redirect('confirm_email')
         else:

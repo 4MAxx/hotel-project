@@ -293,9 +293,16 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="subscribe-form">
-                            <form>
-                                <input type="email" required="required" placeholder="Введите свой email" />
-                                <button>отправить</button>
+                            <form method="post">
+                                {% csrf_token %}
+
+                                <input type="email" required="required" placeholder="Введите свой email" name="email" />
+                                <button name="sign_fore_email" type="submit">отправить</button>
+                                {% if form.errors.email %}
+                                    <div class="alert alert-danger" role="alert">
+                                    {{ form.errors.email }}
+                                    </div> 
+                                {% endif %} 
                             </form>
                         </div>
                     </div>

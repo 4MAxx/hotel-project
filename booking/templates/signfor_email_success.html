@@ -1,0 +1,26 @@
+{% extends 'base_other.html' %}
+
+{% block content %}
+        <!-- Room Section Start -->
+        <div id="booking">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Поздравляем! <span class="text-success"><br>Подписка на рассылку оформлена успешно</span></h2>
+                    
+                </div>
+                <div class="row">
+                        <div class="col-md-12">
+                            <a href="{% url 'home' %}" >
+                                <div class="button" style="text-align: center;"><button type="submit">Перейти на главную</button></div>
+                            </a>
+                            
+                          
+                        </div>
+                    
+                    </div>
+               
+            </div>
+        </div>
+        <!-- Room Section End -->
+        
+{% endblock %}

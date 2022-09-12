@@ -2,7 +2,7 @@
 from django.urls import path
 
 from booking.views import home, booking, aboutus, amenities, contact, mylogin, room_list, registr, confirm_book, \
-    cancel_book, confirm_email, activate
+    cancel_book, confirm_email, activate, signup_for_email_success
 from booking.views import mylogout, profile, create_book, success, fail
 
 urlpatterns = [
@@ -15,6 +15,7 @@ urlpatterns = [
     path('confirmation/', confirm_email, name='confirm_email'),
     path('activate/<uidb64>/<token>/', activate, name='activate'),
     path('success/', success, name='success'),
+    path('signup_success/', signup_for_email_success, name='signup_success'),
     path('fail/', fail, name='fail'),
     path('aboutus/', aboutus, name='aboutus'),
     path('amenities/', amenities, name='amenities'),

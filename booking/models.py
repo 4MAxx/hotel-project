@@ -125,3 +125,15 @@ class CustomUser(AbstractUser):
             return f'{self.last_name} {self.first_name[0]}. - {self.email}'
         else: return self.email
 
+class SignedForEmail(models.Model):
+
+    class Meta:
+        verbose_name = 'Подписки'
+        verbose_name_plural = 'Подписки'
+
+    email = models.EmailField(_('email address'), unique=True)
+    date_of_sign = models.DateField(auto_now_add=True, verbose_name='Дата подписки')
+    date_last_send = models.DateField(blank=True, null=True, verbose_name='Дата последней рассылки')
+
+    def __str__(self):
+        return self.email

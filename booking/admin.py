@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
-from booking.models import Category, Room, Booking, CustomUser
+from booking.models import Category, Room, Booking, CustomUser, SignedForEmail
 
 
 @admin.register(Booking)
@@ -51,6 +51,10 @@ class BookAdmin(admin.ModelAdmin):
                        'date_of_cancel')
     ordering = ('checkin',)
 
+
+admin.site.register(Category)
+
+
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
     list_display = ['number',
@@ -65,8 +69,6 @@ class RoomAdmin(admin.ModelAdmin):
                     'text']
 
     readonly_fields = ('checkin', 'checkout',)
-
-admin.site.register(Category)
 
 
 @admin.register(CustomUser)
@@ -127,3 +129,13 @@ class CustomUserAdmin(UserAdmin):
             if f in form.base_fields:
                 form.base_fields[f].disabled = True
         return form
+
+
+@admin.register(SignedForEmail)
+class SignedForEmailAdmin(admin.ModelAdmin):
+    list_display = ['email',
+                    'date_of_sign',
+                    'date_last_send',
+                    ]
+
+    readonly_fields = ('email', 'date_of_sign','date_last_send',)
