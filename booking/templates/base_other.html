@@ -25,6 +25,7 @@
         <!-- Main Stylesheet File -->
         <link href="{% static 'css/hover-style.css' %}" rel="stylesheet">
         <link href="{% static 'css/style.css' %}" rel="stylesheet">
+        {% block head %}{% endblock head %}
     </head>
 
     <body>        
@@ -141,5 +142,7 @@
   
         <!-- Main Javascript File -->
         <script src="{% static 'js/main.js' %}"></script>
+        {% block javascript %}
+        {% endblock javascript %}
     </body>
 </html>

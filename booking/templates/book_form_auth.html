@@ -169,7 +169,11 @@
                                     <div class="control-group col-md-8">
                                         <label>Стоимость проживания: </label>
                                         {% for room in room_list %}
-                                        <span class="text-span text-success"><b>{% widthratio data.nights 1 room.price %}$</b></span>
+                                        {% if user.is_vip %}
+                                            <span class="text-span text-success"><b>{% widthratio data.nights_d 1 room.price %}$</b></span>
+                                        {% else %}
+                                            <span class="text-span text-success"><b>{% widthratio data.nights 1 room.price %}$</b></span>
+                                        {% endif %}
                                         {% endfor %}
                                         <label>за <span class="text-span text-success"><b>{{ data.nights }}</b></span> ночей</label>
                                         <p class="help-block text-danger"></p>

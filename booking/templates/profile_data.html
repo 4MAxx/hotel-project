@@ -6,6 +6,11 @@
 {% extends 'base_other.html' %}
 {% load static %}
 
+{% block head %}
+<script src="https://js.braintreegateway.com/web/dropin/1.18.0/js/dropin.min.js"></script>
+{% endblock head %}
+
+
 {% block content %}
 
 
@@ -162,8 +167,13 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="room-des">
+                                                    {% if user.is_vip %}
+                                                        <h1>${% widthratio book.room.price 100 85 %}<span>/ Ночь</span></h1>
+                                                        <h3 style="text-decoration: line-through;color: #ff8597;">${{ book.room.price }}<span style="text-decoration: line-through ;">/ Ночь</span></h1>
+                                                    {% else%}
+                                                        <h1>${{ book.room.price }}<span>/ Ночь</span></h1>
+                                                    {% endif %}    
                                                     
-                                                    <h1>${{ book.room.price }}<span>/ Ночь</span></h1>
                                                     <ul class="room-size">
                                                         <li><i class="fa fa-arrow-right"></i>Размер: {{ book.room.size }} м2 </li>
                                                         <li><i class="fa fa-arrow-right"></i>Кроватей: {{ book.room.beds }} раздельных </li>
@@ -264,10 +274,11 @@
                           <li class="list-group-item text-left"><strong>Стоимость: {{ book.cost }} </strong></li>              
                         </ul>         
                       </div>
+                      
                       <div class="modal-footer">
                         {% if book.status_conf == '1' %}
                         {% else %}
-                        <a href="{% url 'confirm_book' pk=book.id %}">
+                        <a href="{% url 'payment_form' user_id=user.id book_id=book.id %}">
                           <button type="button" id="up" class="btn btn-success" name="confirm_book">Оплатить</button>
                         </a> 
                         {% endif %}                       

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import braintree
 from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
@@ -8,6 +9,7 @@ from django.db.models import Q
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 # Create your views here.
@@ -19,6 +21,8 @@ from booking.forms import SearchForm, CustomUserCreationForm, BookingForm, Uploa
 from booking.models import Room, CustomUser, Booking
 from booking.tokens import account_activation_token
 from booking.tasks import send_email_task, send_booking_email_task, send_subj_mes_email_task
+from server import settings
+from server.settings import DISCOUNT_COST
 
 '''
     Флаги контекста
@@ -33,6 +37,7 @@ class SearchFormData():
     ad = 0
     kid = 0
     nights = 1
+    nights_d = 1
     result = False
     id = None
 
@@ -43,6 +48,7 @@ class SearchFormData():
         SearchFormData.ad = 0
         SearchFormData.kid = 0
         SearchFormData.nights = 1
+        SearchFormData.nights_d = 1
         SearchFormData.result = False
 
 
@@ -64,6 +70,7 @@ def searching_results(request):
             checkout = datetime.strptime(SearchFormData.co, '%d.%m.%Y').date()
             if checkin < checkout:
                 SearchFormData.nights = (checkout - checkin).days
+                SearchFormData.nights_d = float(SearchFormData.nights / 100 * (100 - DISCOUNT_COST))
             else:
                 SearchFormData.result = True
                 return []
@@ -143,6 +150,7 @@ def create_book(request, pk):
     '''
     room_list = [Room.objects.get(pk=pk)]
     errors = {}
+    discount = 1
 
     def check_book(booking):
         # выбираем из Бронирований все, что касаются этого номера (только подтвержденные или в стадии подтверждения)
@@ -167,12 +175,14 @@ def create_book(request, pk):
 
     elif request.method == 'POST' and 'booking' in request.POST:
         form = BookingForm(request.POST)
+        if request.user.is_vip:
+            discount = (100 - DISCOUNT_COST) / 100
         if form.is_valid():
             booking = form.save(commit=False)
             booking.user = request.user
             booking.room = Room.objects.get(pk=pk)
             booking.nights = (booking.checkout - booking.checkin).days
-            booking.cost = booking.nights * booking.room.price
+            booking.cost = int(booking.nights * booking.room.price * discount)
             errors = check_book(booking)
             if errors == False:
                 booking.save()
@@ -319,6 +329,7 @@ def profile(request, pk):
     '''
         страница "Профиль гостя"
     '''
+
     form = UploadAvatar()
     if request.method == 'POST' and 'change_avatar' in request.POST:
         form = UploadAvatar(request.POST, request.FILES, instance=request.user)
@@ -334,18 +345,6 @@ def profile(request, pk):
 
 
 @login_required
-def confirm_book(request, pk):
-    '''
-        действие "подтверждение брони"
-    '''
-
-    book = Booking.objects.filter(pk=pk).update(status_conf='1', date_of_conf=datetime.today().date())
-
-    user = request.user
-    return redirect('profile', user.pk)
-
-
-@login_required
 def cancel_book(request, pk):
     '''
         действие "отмена брони"
@@ -355,3 +354,73 @@ def cancel_book(request, pk):
 
     user = request.user
     return redirect('profile', user.pk)
+
+
+@login_required
+def confirm_book(request, pk):
+    '''
+        действие "подтверждение брони" ОПЛАТА BRAINTREE
+    '''
+
+    book = Booking.objects.filter(pk=pk).update(status_conf='1', date_of_conf=datetime.today().date())
+
+    user = request.user
+    return redirect('profile', user.pk)
+
+
+@login_required
+def payment_form(request, user_id, book_id):
+    '''
+        страница "Форма оплаты"
+    '''
+    book = Booking.objects.get(pk=book_id)
+    # braintere
+    if settings.BRAINTREE_PRODUCTION:
+        braintree_env = braintree.Environment.Production
+    else:
+        braintree_env = braintree.Environment.Sandbox
+    # Configure Braintree
+    braintree.Configuration.configure(
+        braintree_env,
+        merchant_id=settings.BRAINTREE_MERCHANT_ID,
+        public_key=settings.BRAINTREE_PUBLIC_KEY,
+        private_key=settings.BRAINTREE_PRIVATE_KEY,
+    )
+    try:
+        braintree_client_token = braintree.ClientToken.generate({"customer_id": user_id})
+    except:
+        braintree_client_token = braintree.ClientToken.generate({})
+
+    context = {'braintree_client_token': braintree_client_token, 'book':book, 'user_id':user_id}
+    return render(request, 'payment_form.html', context)
+
+
+@login_required
+def payment(request, user_id, book_id):
+    '''
+        действие  ОПЛАТА BRAINTREE
+    '''
+    book = Booking.objects.get(pk=book_id)
+    user = CustomUser.objects.get(pk=user_id)
+    nonce_from_the_client = request.POST['paymentMethodNonce']
+    customer_kwargs = {
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email": user.email,
+    }
+    customer_create = braintree.Customer.create(customer_kwargs)
+    customer_id = customer_create.customer.id
+    result = braintree.Transaction.sale({
+        "amount": book.cost,
+        "payment_method_nonce": nonce_from_the_client,
+        "options": {
+            "submit_for_settlement": True
+        }
+    })
+    if result.is_successful:
+        print(result)
+        return redirect('payment_success')
+    else: return redirect('fail')
+
+def payment_success(request):
+    return render(request, 'payment_success.html')

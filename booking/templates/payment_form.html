@@ -1,0 +1,89 @@
+{% extends 'base_other.html' %}
+{% load static %}
+
+{% block head %}
+<script src="https://js.braintreegateway.com/web/dropin/1.18.0/js/dropin.min.js"></script>
+{% endblock head %}
+
+
+{% block content %}
+
+
+<div class="container ">
+    
+    
+    <div id="rooms">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Оплата бронирования</h4>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group">               
+              <li class="list-group-item text-left"><strong>Номер: {{ book.room }} </strong></li>
+              <li class="list-group-item text-left"><strong>Заселение: {{ book.checkin }} </strong></li>
+              <li class="list-group-item text-left"><strong>Убытие: {{ book.checkout }} </strong></li>
+              <li class="list-group-item text-left"><strong>Ночей: {{ book.nights }} </strong></li>   
+              <li class="list-group-item text-left"><strong>Стоимость: {{ book.cost }} </strong></li>              
+            </ul>         
+          </div>
+          <div class="modal-body">
+            <!-- Braintree form -->
+              <form autocomplete="off">
+                {% if braintree_error %}
+                  <div class="alert alert-danger fade in">
+                      <button class="close" data-dismiss="alert">&times;</button>
+                      {{ braintree_error|safe }}
+                  </div>
+                {% endif %}
+                <div class="braintree-notifications"></div>
+                <div id="braintree-dropin"></div>
+                <input style="background-color: #0783ca" id="submit-button" class="btn btn-success btn-lg btn-block" type="button" value="Оплатить!" />
+              </form>
+            <!-- Braintree form ends -->
+          </div>  
+          <div class="modal-footer">
+            <a href="{% url 'confirm_book' pk=book.id %}">
+              <button type="button" id="up" class="btn btn-success" name="confirm_book">Оплатить</button>
+            </a> 
+            <a href="{% url 'profile' pk=user_id %}">
+              <button type="button" class="btn btn-danger" >Отмена</button>
+            </a> 
+          </div>
+        </div>
+      </div>
+    </div>
+   
+</div><!--conteiner-->
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+    var braintree_client_token = "{{ braintree_client_token }}";
+    var button = document.querySelector('#submit-button');
+
+    braintree.dropin.create({
+      authorization: braintree_client_token,
+      container: '#braintree-dropin',
+      card: {
+        cardholderName: {
+            required: false
+        }
+      }
+    }, function (createErr, instance) {
+        button.addEventListener('click', function () {
+            instance.requestPaymentMethod(function (err, payload) {
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "payment" user_id=user_id book_id=book.pk %}',
+                    data: {'paymentMethodNonce': payload.nonce,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'}
+                }).done(function (result) {
+                   //do accordingly
+                });
+            });
+        });
+    });
+</script>
+{% endblock javascript %}

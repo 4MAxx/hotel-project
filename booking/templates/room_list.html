@@ -47,10 +47,21 @@
                                 <div class="room-des">
                                     <h3>{{room.number}}-{{ room.category }}</h3>
                                     {% if data.result == True %}
-                                    <h2 class="text-success">{{ data.nights }} ночей - {% widthratio data.nights 1 room.price %}$</h2>
-                                    <h3>${{ room.price }}<span>/ Ночь</span></h3>
+                                        {% if user.is_vip %}
+                                            <h2 class="text-success">{{ data.nights }} ночей - {% widthratio data.nights_d 1 room.price %}$</h2>
+                                            <h3>${% widthratio room.price 100 85 %}<span>/ Ночь</span></h3>
+                                            <h3 style="text-decoration: line-through;color: #ff8597;">${{ room.price }}<span style="text-decoration: line-through ;">/ Ночь</span></h3>
+                                        {% else%}
+                                            <h2 class="text-success">{{ data.nights }} ночей - {% widthratio data.nights 1 room.price %}$</h2>
+                                            <h3>${{ room.price }}<span>/ Ночь</span></h3>
+                                        {% endif %}
                                     {% else %}
-                                    <h1>${{ room.price }}<span>/ Ночь</span></h1>
+                                        {% if user.is_vip %}
+                                            <h1>${% widthratio room.price 100 85 %}<span>/ Ночь</span></h1>
+                                            <h3 style="text-decoration: line-through;color: #ff8597;">${{ room.price }}<span style="text-decoration: line-through ;">/ Ночь</span></h1>
+                                        {% else%}
+                                            <h1>${{ room.price }}<span>/ Ночь</span></h1>
+                                        {% endif %}    
                                     {% endif %}
                                     <ul class="room-size">
                                         <li><i class="fa fa-arrow-right"></i>Размер: {{ room.size }} м2 </li>

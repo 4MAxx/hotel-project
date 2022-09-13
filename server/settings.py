@@ -10,11 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from config import my_host, my_name, my_port, my_user, my_psw, s_key, email_use_tls, email_use_ssl, email_host, \
-    email_host_user, email_host_password, email_port
+    email_host_user, email_host_password, email_port, Merchant_ID, Public_Key, Private_Key
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -144,6 +145,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 LOGIN_REDIRECT_URL = 'login/'
 
+# дисконт в процентах
+DISCOUNT_COST = 15
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -160,3 +164,14 @@ CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+# Braintree
+# if (len(sys.argv) >= 2 and sys.argv[1] == 'runserver'):
+#     BRAINTREE_PRODUCTION = False
+# else:
+#     BRAINTREE_PRODUCTION = True
+BRAINTREE_PRODUCTION = False
+
+BRAINTREE_MERCHANT_ID = Merchant_ID
+BRAINTREE_PUBLIC_KEY = Public_Key
+BRAINTREE_PRIVATE_KEY = Private_Key

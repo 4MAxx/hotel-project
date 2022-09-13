@@ -14,7 +14,7 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {'tracing-expired-booking-every-day-at-00-05':
                             {
                             'task': 'booking.tasks.booking_expired_tracing_task',
-                            'schedule': crontab(minute=0, hour='*/1'),
+                            'schedule': crontab(minute=0, hour='*/8'),
                             }
 }
 
