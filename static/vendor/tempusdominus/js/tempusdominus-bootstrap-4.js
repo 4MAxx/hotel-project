@@ -120,7 +120,7 @@ var DateTimePicker = function ($, moment) {
         dayViewHeaderFormat: 'MMMM YYYY',
         extraFormats: false,
         stepping: 1,
-        minDate: false,
+        minDate: new Date(),
         maxDate: false,
         useCurrent: true,
         collapse: true,

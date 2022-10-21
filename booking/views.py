@@ -40,6 +40,7 @@ class SearchFormData():
     nights_d = 1
     result = False
     id = None
+    error_date = False
 
     @staticmethod
     def reset():
@@ -50,6 +51,7 @@ class SearchFormData():
         SearchFormData.nights = 1
         SearchFormData.nights_d = 1
         SearchFormData.result = False
+        SearchFormData.error_date = False
 
 
 # обработчик формы поиска свободных номеров
@@ -63,6 +65,7 @@ def searching_results(request):
     SearchFormData.co = request.POST['checkout']
     SearchFormData.ad = request.POST['adults']
     SearchFormData.kid = request.POST['kids']
+    SearchFormData.error_date = False
 
     if SearchFormData.ci and SearchFormData.co and SearchFormData.ad:
         try:
@@ -70,10 +73,13 @@ def searching_results(request):
             checkout = datetime.strptime(SearchFormData.co, '%d.%m.%Y').date()
             if checkin < checkout:
                 SearchFormData.nights = (checkout - checkin).days
+                # расчет дисконта (применяется для vip-гостя)
                 SearchFormData.nights_d = float(SearchFormData.nights / 100 * (100 - DISCOUNT_COST))
             else:
+                # если пользователь ввел дату заезда более позднюю чем дату выезда или "==", то нужно выводить ошибку
                 SearchFormData.result = True
-                return []
+                SearchFormData.error_date = True
+                return None
 
             capacity = int(SearchFormData.ad) + int(SearchFormData.kid)
         except:
@@ -99,6 +105,24 @@ def searching_results(request):
         SearchFormData.reset()
         return None
 
+# Проверка бронирования на ошибки (при создании бронирования create_book())
+def check_book(booking):
+    errors = {}
+    # выбираем из Бронирований все, что касаются этого номера (только подтвержденные или в стадии подтверждения)
+    room = Booking.objects.filter(room=booking.room.pk, status_conf__in=['1','2'])
+    # ищем пересечения по датам
+    check = room.all().exclude(Q(checkout__lte=booking.checkin, checkout__lt=booking.checkout) |
+                                Q(checkin__gte=booking.checkout, checkin__gt=booking.checkin))
+    # если нашлось пересечение, значит запишет ошибку
+    if check:
+        errors['book'] = True
+    # если вместимость номера меньше запрашиваемой, значит запишет ошибку
+    if booking.kids + booking.adults > booking.room.capacity:
+        errors['capacity'] = True
+    if booking.checkin >= booking.checkout:
+        errors['date'] = True
+    # если бронирование прошло проверку и нет ошибок то False иначе вернет словарь с ошибками
+    return False if not errors else errors
 
 def home(request):
     '''
@@ -149,25 +173,7 @@ def create_book(request, pk):
         страница "Бронирование номера"
     '''
     room_list = [Room.objects.get(pk=pk)]
-    errors = {}
     discount = 1
-
-    def check_book(booking):
-        # выбираем из Бронирований все, что касаются этого номера (только подтвержденные или в стадии подтверждения)
-        room = Booking.objects.filter(room=booking.room.pk, status_conf__in=['1','2'])
-        # ищем пересечения по датам
-        check = room.all().exclude(Q(checkout__lte=booking.checkin, checkout__lt=booking.checkout) |
-                                    Q(checkin__gte=booking.checkout, checkin__gt=booking.checkin))
-        # если нашлось пересечение, значит запишет ошибку
-        if check:
-            errors['book'] = True
-        # если вместимость номера меньше запрашиваемой, значит запишет ошибку
-        if booking.kids + booking.adults > booking.room.capacity:
-            errors['capacity'] = True
-        if booking.checkin >= booking.checkout:
-            errors['date'] = True
-        # если бронирование прошло проверку и нет ошибок то False иначе вернет словарь с ошибками
-        return False if not errors else errors
 
     if request.method == 'POST' and 'search' in request.POST:
         context = {'room_list': searching_results(request), 'search': True, 'data': SearchFormData}
@@ -299,6 +305,7 @@ def registr(request):
     return render(request, 'login.html', {'search': False, 'mode':'registr'})
 
 
+@login_required
 def confirm_email(request):
     '''
         страница-заглушка "подтвердите email для активации аккаунта"
