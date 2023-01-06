@@ -26,11 +26,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = s_key
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -138,11 +133,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = [STATIC_DIR]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 LOGIN_REDIRECT_URL = 'login/'
 
 # дисконт в процентах
@@ -165,13 +159,20 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-# Braintree
-# if (len(sys.argv) >= 2 and sys.argv[1] == 'runserver'):
-#     BRAINTREE_PRODUCTION = False
-# else:
-#     BRAINTREE_PRODUCTION = True
-BRAINTREE_PRODUCTION = False
+# разделяем логику настроек на ЛОКАЛ и ППРОДАКШН варианты
+if (len(sys.argv) >= 2 and sys.argv[1] == 'runserver'):
+    from .local_set import *
+    BRAINTREE_PRODUCTION = False
+else:
+    from .prod_set import *
+    BRAINTREE_PRODUCTION = True
 
 BRAINTREE_MERCHANT_ID = Merchant_ID
 BRAINTREE_PUBLIC_KEY = Public_Key
 BRAINTREE_PRIVATE_KEY = Private_Key
+
+# разделяем логику настроек на ЛОКАЛ и ППРОДАКШН варианты (2 варик)
+# try:
+#     from .local_set import *
+# except ImportError:
+#     from .prod_set import *
