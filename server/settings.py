@@ -165,7 +165,7 @@ if (len(sys.argv) >= 2 and sys.argv[1] == 'runserver'):
     BRAINTREE_PRODUCTION = False
 else:
     from .prod_set import *
-    BRAINTREE_PRODUCTION = True
+    BRAINTREE_PRODUCTION = False
 
 BRAINTREE_MERCHANT_ID = Merchant_ID
 BRAINTREE_PUBLIC_KEY = Public_Key

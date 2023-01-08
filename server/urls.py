@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('', include('booking.urls')),
 
-]
+]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # Если в режиме DEBUG, то media раздает django, а если в продакшене, то nginx
-if settings.DEBUG:
-    urlpatterns +=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# if settings.DEBUG:
+#     urlpatterns +=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -305,7 +305,7 @@ def registr(request):
     return render(request, 'login.html', {'search': False, 'mode':'registr'})
 
 
-@login_required
+# @login_required
 def confirm_email(request):
     '''
         страница-заглушка "подтвердите email для активации аккаунта"
